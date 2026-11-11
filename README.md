@@ -17,6 +17,12 @@ This repository only contains the small amount of glue code needed to make that 
 - This is a fan port for personal, single-player use. It needs the original mod to work, so please download it from CybrDrake's
   Nexus page (and endorse it there if you like it): everything that matters here is their work.
 
+## Demo video
+
+[![Watch the demo video](https://img.youtube.com/vi/Qqs_4r0ztXE/hqdefault.jpg)](https://youtu.be/Qqs_4r0ztXE)
+
+Video: https://youtu.be/Qqs_4r0ztXE (unlisted on YouTube, so it is only reachable from this link).
+
 ## What works (status)
 
 Roughly **60% of the whole port** is done. The part you use every day (camera and controls) is in good shape.
