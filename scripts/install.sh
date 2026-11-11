@@ -1,20 +1,27 @@
 #!/bin/zsh
 # Installs the Immersive Third Person Mac port. Only ADDS new files to the game; uninstall.sh removes them again.
-# Usage: ./scripts/install.sh <unzipped original mod folder> [game folder] [--dry-run] [--no-animations]
+# Usage: ./scripts/install.sh <unzipped original mod folder> [game folder] [--dry-run] [--no-animations] [--yes]
 set -eu
 HERE="${0:A:h:h}"
 DEFAULT_GAME="$HOME/Library/Application Support/Steam/steamapps/common/Cyberpunk 2077"
-MOD=""; GAME=""; DRY=0; ANIM=1
+MOD=""; GAME=""; DRY=0; ANIM=1; YES=0
 for a in "$@"; do
   case "$a" in
     --dry-run) DRY=1;;
     --no-animations) ANIM=0;;
+    --yes) YES=1;;
     --*) echo "unknown option $a"; exit 1;;
     *) if [[ -z "$MOD" ]]; then MOD="$a"; elif [[ -z "$GAME" ]]; then GAME="$a"; fi;;
   esac
 done
 GAME="${GAME:-$DEFAULT_GAME}"
-[[ -n "$MOD" ]] || { echo "usage: $0 <unzipped original mod folder> [game folder] [--dry-run] [--no-animations]"; exit 1; }
+[[ -n "$MOD" ]] || { echo "usage: $0 <unzipped original mod folder> [game folder] [--dry-run] [--no-animations] [--yes]"; exit 1; }
+if (( ANIM )) && [[ "$DRY" != "1" && "$YES" != "1" && -t 0 ]]; then
+  echo "The animation swap replaces the game's own animations for V (first and third person) with the mod's third-person ones."
+  echo "No game file is edited, and you can switch it off any time with ./scripts/animations.sh off (or double-click 'Animations OFF.command')."
+  read "ans?Install the animation swap? [Y/n] "
+  [[ "$ans" == [nN]* ]] && ANIM=0
+fi
 MOD="${MOD:A}"
 # the unzipped folder may have an extra level (macOS Archive Utility): find the real mod root
 _found="$(find "$MOD" -maxdepth 5 -type d -path '*r6/scripts/immersive_third_person' 2>/dev/null | head -1)"

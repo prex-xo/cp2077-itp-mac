@@ -29,6 +29,7 @@ public func ITPMCfgBlend() -> Float { return 0.3; }            // camera blend t
 @addField(PlayerPuppet) public let m_itpWanted: Bool;     // what the user asked for with G
 @addField(PlayerPuppet) public let m_itpPitch: Float;
 @addField(PlayerPuppet) public let m_itpUseTpp: Bool;
+@addField(PlayerPuppet) public let m_itpProfSeen: Int32;     // last value of the 'Active camera profile' setting that we know about (1..5)
 @addField(PlayerPuppet) public let m_itpProfile: Int32;      // 0..4, camera preset
 @addField(PlayerPuppet) public let m_itpShoulder: Bool;      // hold: shoulder zoom
 @addField(PlayerPuppet) public let m_itpShoulderB: Float;    // 0..1 blend
@@ -426,6 +427,37 @@ public func ITPMMotionStep() -> Void {
   this.m_itpMPitch = mpitch * amp;
 }
 
+
+// Keeps the 'Active camera profile' setting and the profile keys in sync (so the menu shows which profile is on).
+public func ITPMPublishProfile(n: Int32) -> Void {
+  let vars: array<ref<ConfigVar>> = ModSettings.GetVars(n"Immersive Third Person", n"Camera");
+  for v in vars {
+    if Equals(v.GetName(), n"activeProfile") {
+      let iv: ref<ModConfigVarInt32> = v as ModConfigVarInt32;
+      if IsDefined(iv) {
+        iv.SetValue(n);
+      }
+    }
+  }
+}
+
+@addMethod(PlayerPuppet)
+public func ITPMSyncProfile() -> Void {
+  let set: ref<ITPMSettings> = this.ITPMSet();
+  if set.activeProfile != this.m_itpProfSeen {
+    // changed in the menu (or first run): adopt it
+    this.m_itpProfile = Clamp(set.activeProfile - 1, 0, 4);
+    this.m_itpProfSeen = set.activeProfile;
+  } else {
+    if this.m_itpProfile + 1 != this.m_itpProfSeen {
+      // changed with the keys: show it in the menu
+      this.m_itpProfSeen = this.m_itpProfile + 1;
+      set.activeProfile = this.m_itpProfSeen;
+      ITPMPublishProfile(this.m_itpProfSeen);
+    }
+  }
+}
+
 // Five camera presets (cycled with the profile keys). 0 = the default view.  k: 0 side, 1 distance, 2 height
 public func ITPMProfileVal(set: ref<ITPMSettings>, idx: Int32, k: Int32) -> Float {
   return set.Val(Clamp(idx, 0, 4), k);     // every profile has its own values in Mod Settings
@@ -438,6 +470,7 @@ public func ITPMUpdateTppCam() -> Void {
     return;
   }
   this.m_itpPitchS += (this.m_itpPitch - this.m_itpPitchS) * this.ITPMSet().smooth;
+  this.ITPMSyncProfile();
   this.m_itpShoulderB += ((this.m_itpShoulder ? 1.0 : 0.0) - this.m_itpShoulderB) * 0.2;
   this.ITPMMotionStep();
   let b: Float = this.m_itpShoulderB;
@@ -987,7 +1020,7 @@ public func ITPMHandleAction(name: CName, action: ListenerAction) -> Bool {
     if down {
       let step: Int32 = Equals(name, n"ITP_ProfileNext") ? 1 : 4;
       this.m_itpProfile = (this.m_itpProfile + step) % 5;
-      this.ITPMNotify("Camera profile " + ToString(this.m_itpProfile + 1) + " of 5");
+      this.ITPMNotify("Camera profile " + ToString(this.m_itpProfile + 1) + " of 5 (active)");
     }
     return true;
   }

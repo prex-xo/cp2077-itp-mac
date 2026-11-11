@@ -5,6 +5,16 @@ public class ITPMSettings {
   // ---- Camera ----
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera")
+  @runtimeProperty("ModSettings.category.order", "10")
+  @runtimeProperty("ModSettings.displayName", "Active camera profile")
+  @runtimeProperty("ModSettings.description", "Which of the 5 camera profiles is on right now (1-5). Also changes when you press the profile keys. Each profile has its own page below.")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.min", "1")
+  @runtimeProperty("ModSettings.max", "5")
+  public let activeProfile: Int32 = 1;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera")
   @runtimeProperty("ModSettings.displayName", "Camera start delay")
   @runtimeProperty("ModSettings.description", "Seconds the camera waits after you press the toggle key, so V's head can appear first. Lower = faster camera, higher = head ready sooner than the camera moves.")
   @runtimeProperty("ModSettings.step", "0.05")

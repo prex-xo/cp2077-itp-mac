@@ -90,6 +90,20 @@ To remove everything: `./scripts/uninstall.sh`.
 
 If the installer says the scripts don't compile, you most likely have a different version of the original mod or of the game. Send me the error text.
 
+## Updating from an older version
+
+If you already installed an earlier version, update like this (your Mod Settings values are kept, except the old single side / distance / height / FOV
+settings, which became one page per camera profile):
+
+```sh
+cd cp2077-itp-mac
+git pull
+./scripts/update.sh "/path/to/unzipped/mod"
+```
+
+`update.sh` removes the old install and installs the new one (it asks whether you want the animation swap). Quit the game first.
+If you prefer, run `./scripts/uninstall.sh` and then `./scripts/install.sh "/path/to/unzipped/mod"` yourself.
+
 ## Controls
 
 Third person is toggled with the game's walk-toggle key (**G** by default). The other keys come from `r6/input/itp_mac_input.xml`
@@ -107,7 +121,7 @@ Third person is toggled with the game's walk-toggle key (**G** by default). The 
 **Free look** is automatic: when V stands still for a moment, the mouse orbits the camera around her (her body stays put).
 As soon as she moves, the camera swings back behind her and it is normal third person.
 
-Settings are in the game's **Settings → Mod Settings → Immersive Third Person** page: one page per camera profile
+Settings are in the game's **Settings → Mod Settings → Immersive Third Person** page: an **Active camera profile** selector (shows which of the 5 profiles is on and follows the `[` `]` keys) and one page per camera profile
 (side, distance, height, FOV), wall collision, camera start delay (tune it if V's head appears later than the camera),
 look speeds, automatic free look, first person in the scanner and in elevators, camera motion, on-screen messages.
 
@@ -125,7 +139,9 @@ So the installer does the swap **statically**: it builds one extra archive from 
   ./scripts/animations.sh on       # on again
   ./scripts/animations.sh status
   ```
-  Quit the game first. If you want the mod without it from the start, install with `--no-animations`.
+  Quit the game first. Prefer clicking? Double-click **`scripts/Animations OFF.command`** (or **`Animations ON.command`**).
+  The installer also asks whether you want the animation swap; `--no-animations` skips it, `--yes` answers yes without asking.
+  (A Mod Settings switch is not possible: the game loads its archives when it starts, so an in-game menu cannot turn one off.)
 - Everything else (camera, free look, settings) works with the animation swap on or off.
 
 
