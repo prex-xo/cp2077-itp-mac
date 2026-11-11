@@ -8,10 +8,13 @@ for a in "$@"; do [[ "$a" == "--dry-run" ]] && DRY=1; done
 [[ "$GAME" == "--dry-run" ]] && GAME="$HOME/Library/Application Support/Steam/steamapps/common/Cyberpunk 2077"
 [[ -n "$MOD" && "$MOD" != "--dry-run" ]] || { echo "usage: $0 <unzipped original mod folder> [game folder] [--dry-run]"; exit 1; }
 MOD="${MOD:A}"
+# the unzipped folder may have an extra level (macOS Archive Utility): find the real mod root
+_found="$(find "$MOD" -maxdepth 5 -type d -path '*r6/scripts/immersive_third_person' 2>/dev/null | head -1)"
+[[ -n "$_found" ]] && MOD="${_found%/r6/scripts/immersive_third_person}"
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 [[ -x "$GAME/engine/tools/scc" ]] || die "game not found at: $GAME (pass the game folder as 2nd argument)"
-[[ -d "$GAME/red4ext/plugins/ArchiveXL" && -d "$GAME/red4ext/plugins/input_loader" && -d "$GAME/red4ext/plugins/ModSettings" ]] || die "NightCity Console's frameworks are not installed in the game yet: open the NightCity Console app and press Play once, then quit the game and run this again."
+[[ -d "$GAME/red4ext/plugins/ArchiveXL" && -d "$GAME/red4ext/plugins/input_loader" && -d "$GAME/red4ext/plugins/ModSettings" && -d "$GAME/r6/scripts/zz_nightcity_plugins" ]] || die "NightCity Console's runtime is not installed in the game yet: open the NightCity Console app, click Install (then Play once), quit the game, and run this again."
 build="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$GAME/Cyberpunk2077.app/Contents/Info.plist" 2>/dev/null || true)"
 [[ "$build" == "5814786" ]] || echo "WARNING: game build is '$build', this was made for 5814786 (2.5.0)."
 [[ "$DRY" != "1" ]] && pgrep -x Cyberpunk2077 >/dev/null && die "the game is running: quit it first."

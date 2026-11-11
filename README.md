@@ -46,10 +46,10 @@ Roughly **60% of the whole port** is done. The part you use every day (camera an
 
 ## Install: step by step
 
-1. **Install NightCity Console 1.9.0** (the app is called **NightCity Console**; see its releases page for the download and its own instructions).
-   It can stay wherever you put it (for example `/Applications`); it does **not** have to go into the game folder.
-   Open it and press **Play once**. This installs the frameworks into the game folder (`red4ext/plugins/ArchiveXL`, `input_loader`, `ModSettings`, ...).
-   Quit the game afterwards.
+1. **Install NightCity Console 1.9.0:** download it from its releases page, drag **NightCity Console** into your Applications folder and open it
+   (it does **not** have to go into the game folder). In the app, click **Install**. This installs the runtime and frameworks into the game
+   (`red4ext/plugins/ArchiveXL`, `input_loader`, `ModSettings`, ..., the script compiler, and re-signs the game binary so mods can load).
+   Then click **Play** once to check that the game starts, and quit the game. NightCity Console has an install video and a guide in the app.
 2. **Download and unzip the original mod** from the Nexus link above. Remember the folder it unzipped to.
 3. **Clone this repo:**
    ```sh
@@ -69,11 +69,14 @@ Roughly **60% of the whole port** is done. The part you use every day (camera an
    - `archive/Mac/mod/immersive_third_person.archive` and `..._v_lipsync_en.archive` (original's archives: they contain the third-person camera component and the animation graph)
    - a manifest in `red4ext/nightcity/mods/`
    It only **adds** files; it never overwrites game files.
-5. **Start the game with NightCity Console's Play button.** NCC compiles the scripts and starts the game with the frameworks injected.
+5. **Start the game with NightCity Console's Play button** (not directly from Steam: mods only load when NightCity Console starts the game). NCC compiles the scripts and starts the game with the frameworks injected.
    Make a manual save first the first time.
 6. **In game:** load a save and press **G**.
 
 To remove everything: `./scripts/uninstall.sh`.
+
+**After a game or NightCity Console update:** click **Install** (or "Reinstall NightCity Console") in the app again. If the mod stops loading, run
+`./scripts/uninstall.sh` and then `./scripts/install.sh ...` again. NightCity Console blocks mod changes while the game is running, and so does the installer.
 
 If the installer says the scripts don't compile, you most likely have a different version of the original mod or of the game. Send me the error text.
 
