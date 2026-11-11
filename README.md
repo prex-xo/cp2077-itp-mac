@@ -31,15 +31,18 @@ Roughly **60% of the whole port** is done. The part you use every day (camera an
 |---|---|
 | Toggle third person (G) | works |
 | Third-person camera (the original's separate `tppCamera`), head and clothes | works |
-| Automatic first person: weapon drawn, vehicles, cutscenes and dialogue, braindance, other bodies (e.g. behavioral imprint) | works (returning after the long imprint mission still untested) |
-| Camera profiles (5), shoulder zoom, front view, quick first person | works |
-| **Free look** (toggle) | works |
-| Wall collision (camera pulls in at walls) | works (static world only; not cars/props) |
+| Smooth first-to-third-person transition | works (the way back to first person is not polished yet) |
+| Automatic first person: weapon drawn, vehicles, cutscenes and dialogue, braindance, scanner / quickhack view (Tab), elevators, other bodies (e.g. behavioral imprint) | works (returning after the long imprint mission still untested) |
+| 5 camera profiles, each with its own side / distance / height / FOV in the settings menu | works |
+| Shoulder zoom, front view, quick first person | works |
+| **Free look**: automatic while V stands still; normal third person once she moves | works |
+| Wall collision (camera pulls in at walls) | works (static world and visibility geometry; not cars/props) |
 | Camera motion: dynamic distance, walking bob, shake, crouch/sprint height | works (no slide tilt / landing shake yet) |
 | Settings menu (Mod Settings) | works |
-| Animations from the mod's archive | partial: see Stage 3 |
-| First person at terminals / devices | not done (no reliable game signal found yet) |
-| 360° movement, loot range, head guard, scene redirect | not done (these are done by the original's Windows DLL) |
+| **Animations** (the mod's third-person animation sets, installed as one extra archive) | works, see the animation note below |
+| First person at terminals / devices, takedowns, left-hand cyberware | not done yet |
+| Dash, auto-vault, sprint-stop and consumable animations (scripts are in the mod but dormant) | not done yet |
+| 360° / GTA-style movement, loot range, head guard, scene redirect | not done (these are done by the original's Windows DLL) |
 
 ## Requirements
 
@@ -73,6 +76,7 @@ Roughly **60% of the whole port** is done. The part you use every day (camera an
    - `r6/tweaks/immersive_third_person/` (original tweak files)
    - `r6/input/itp_mac_input.xml` (our hotkeys, loaded by Input Loader)
    - `archive/Mac/mod/immersive_third_person.archive` and `..._v_lipsync_en.archive` (original's archives: they contain the third-person camera component and the animation graph)
+   - `archive/Mac/mod/itp_mac_tpp_animsets.archive` (the animation swap, **built on your Mac from your copy of the mod**, see the note below; use `--no-animations` to skip it)
    - a manifest in `red4ext/nightcity/mods/`
    It only **adds** files; it never overwrites game files.
 5. **Start the game with NightCity Console's Play button** (not directly from Steam: mods only load when NightCity Console starts the game). NCC compiles the scripts and starts the game with the frameworks injected.
@@ -94,14 +98,36 @@ Third person is toggled with the game's walk-toggle key (**G** by default). The 
 | Key | Action |
 |---|---|
 | `G` | third person on/off |
-| `.` | free look on/off (camera orbits around V; V's body stays put) |
+| `.` | switch the automatic free look on/off |
 | `,` | quick first person (hold) |
 | `;` | shoulder zoom (hold) |
 | `'` | front view (hold) |
 | `[` / `]` | previous / next camera profile (5) |
 
-Settings (distance, side, height, FOV, wall collision, look speeds, camera motion, on-screen messages) are in the game's
-**Settings → Mod Settings → Immersive Third Person** page.
+**Free look** is automatic: when V stands still for a moment, the mouse orbits the camera around her (her body stays put).
+As soon as she moves, the camera swings back behind her and it is normal third person.
+
+Settings are in the game's **Settings → Mod Settings → Immersive Third Person** page: one page per camera profile
+(side, distance, height, FOV), wall collision, camera start delay (tune it if V's head appears later than the camera),
+look speeds, automatic free look, first person in the scanner and in elevators, camera motion, on-screen messages.
+
+## Animations: please read
+
+The mod's big feature is full-body third-person animation. On Windows a DLL swaps the animation sets in memory; a Windows DLL cannot run on Mac.
+So the installer does the swap **statically**: it builds one extra archive from your copy of the mod,
+`archive/Mac/mod/itp_mac_tpp_animsets.archive` (about 520 MB, 660 animation sets), which replaces the game's own animation sets for V.
+
+- **No game file is edited.** It is an extra file that the game loads after its own archives.
+- It affects **first and third person**, because there is no live switching on Mac. In testing, first person looked fine and third person got
+  full-body movement, but this is new, so **if anything looks wrong with V's animations, switch it off**:
+  ```sh
+  ./scripts/animations.sh off      # back to the game's own animations (the file is only renamed)
+  ./scripts/animations.sh on       # on again
+  ./scripts/animations.sh status
+  ```
+  Quit the game first. If you want the mod without it from the start, install with `--no-animations`.
+- Everything else (camera, free look, settings) works with the animation swap on or off.
+
 
 ## How it works (short)
 
@@ -114,18 +140,17 @@ Settings (distance, side, height, FOV, wall collision, look speeds, camera motio
 
 ## Roadmap: Stage 3 and further
 
-**Stage 3: animations (not done; partly works today).**
-The original ships ~1,390 third-person animation sets. On Windows its DLL swaps them into the game **live** (in memory), switching between
-first-person and third-person versions. A Windows DLL cannot run on Mac, so today only what the archive's animation graph provides works
-(running and walking look right; some other actions can look stiff or like first-person).
-Two possible routes:
-- **A. Static swap:** put the third-person sets permanently into the archives. Works (tried before on ~500 sets), no live switching, and it means editing game archives (backups needed).
-- **B. A native Mac RED4ext plugin** that does the live swap like the DLL. Needs disassembling the Windows DLL; much easier with the author's help or source.
+**Stage 3: animations (works as a static swap).**
+The original ships ~1,390 third-person animation sets and its Windows DLL swaps them in **live**. Here the same job is done statically
+(see the animation note above): 660 sets are replaced through one extra archive. Still open:
+- one more set (consumable / buff clips, 15 MB) has no partner in the game and must be *added* to V, which the static swap does not do yet;
+- no live switching between first- and third-person versions (the third-person versions are used in both);
+- a native Mac RED4ext plugin could still do the live swap like the DLL (needs disassembling the DLL; much easier with the author's help).
 
 **Stage 4: the DLL's other features (not done).**
 360° movement, loot pickup range, head render guard, scene redirect. Also the old known bugs: blurry/blocky head in some views, and spine bending when aiming.
 
-**Smaller open items:** first person at terminals/devices, slide tilt and landing shake, free look refinements.
+**Smaller open items:** first person at terminals/devices, takedowns and left-hand cyberware; waking up the original's dormant dash, auto-vault and consumable features; a key-binding page; slide tilt and landing shake; a smoother return to first person.
 
 Anyone who knows how the DLL swaps animation sets is very welcome to get in touch.
 

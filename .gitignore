@@ -11,3 +11,4 @@
 !scripts/
 !scripts/*.sh
 !scripts/*.py
+!scripts/*.json

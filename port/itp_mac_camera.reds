@@ -20,7 +20,9 @@ public func ITPMCfgConjugate() -> Bool { return false; }  // flip if rotation lo
 public func ITPMCfgMinHeight() -> Float { return 0.40; }  // camera never lower than this above V's feet
 public func ITPMCfgPitchMin() -> Float { return -60.0; }   // look down limit (degrees)
 public func ITPMCfgPitchMax() -> Float { return 50.0; }    // look up limit (degrees)
-public func ITPMCfgSnapshotDelay() -> Float { return 0.4; }
+public func ITPMCfgSnapshotDelay() -> Float { return 0.05; }   // delay before the third-person camera starts (was 0.4)
+public func ITPMCfgHeadDelay() -> Float { return 0.0; }       // delay of the head's final activation step (was 0.8, then 0.2; 0 = at once)
+public func ITPMCfgBlend() -> Float { return 0.3; }            // camera blend time in seconds
 // -----------------------------------------------------------------------------
 
 @addField(PlayerPuppet) public let m_itpTppOn: Bool;      // third person is actually active right now
@@ -32,7 +34,8 @@ public func ITPMCfgSnapshotDelay() -> Float { return 0.4; }
 @addField(PlayerPuppet) public let m_itpShoulderB: Float;    // 0..1 blend
 @addField(PlayerPuppet) public let m_itpFront: Bool;         // hold: front view
 @addField(PlayerPuppet) public let m_itpQuick: Bool;         // hold: quick first person
-@addField(PlayerPuppet) public let m_itpFovSet: Float;   // using the mod's own tppCamera component
+@addField(PlayerPuppet) public let m_itpFovSet: Float;
+@addField(PlayerPuppet) public let m_itpFovCur: Float;   // using the mod's own tppCamera component
 @addField(PlayerPuppet) public let m_itpSetSince: Bool;
 @addField(PlayerPuppet) public let m_itpSkips: Int32;
 @addField(PlayerPuppet) public let m_itpPrevW: Vector4;
@@ -425,23 +428,7 @@ public func ITPMMotionStep() -> Void {
 
 // Five camera presets (cycled with the profile keys). 0 = the default view.  k: 0 side, 1 distance, 2 height
 public func ITPMProfileVal(set: ref<ITPMSettings>, idx: Int32, k: Int32) -> Float {
-  let side: array<Float> = [0.40, 0.55, 0.00, 0.70, -0.40];
-  let dist: array<Float> = [2.70, 1.60, 2.20, 3.60, 2.70];
-  let high: array<Float> = [1.60, 1.55, 1.90, 1.70, 1.60];
-  let i: Int32 = Clamp(idx, 0, 4);
-  if i == 0 {
-    // profile 1 is the user's own (Mod Settings)
-    if k == 0 { return set.side; }
-    if k == 1 { return set.distance; }
-    return set.height;
-  }
-  if k == 0 {
-    return side[i];
-  }
-  if k == 1 {
-    return dist[i];
-  }
-  return high[i];
+  return set.Val(Clamp(idx, 0, 4), k);     // every profile has its own values in Mod Settings
 }
 
 @addMethod(PlayerPuppet)
@@ -501,12 +488,17 @@ public func ITPMUpdateTppCam() -> Void {
     let full: Float = SqrtF(dx * dx + dy * dy + dz * dz);
     let target: Float = 1.0;
     if full > 0.05 {
-      let res: TraceResult;
-      let hit: Bool = GameInstance.GetSpatialQueriesSystem(this.GetGame()).SyncRaycastByCollisionGroup(new Vector4(sx, sy, sz2, 1.0), new Vector4(ex, ey, ez, 1.0), n"Static", res, true, false);
-      if hit && TraceResult.IsValid(res) {
-        let hp: Vector4 = Cast<Vector4>(res.position);
-        let hd: Float = SqrtF((hp.X - sx) * (hp.X - sx) + (hp.Y - sy) * (hp.Y - sy) + (hp.Z - sz2) * (hp.Z - sz2));
-        target = ClampF((hd - this.ITPMSet().collisionMargin) / full, 0.10, 1.0);
+      let groups: array<CName> = [n"Static", n"Visibility"];
+      let gi: Int32 = 0;
+      while gi < ArraySize(groups) {
+        let res: TraceResult;
+        let hit: Bool = GameInstance.GetSpatialQueriesSystem(this.GetGame()).SyncRaycastByCollisionGroup(new Vector4(sx, sy, sz2, 1.0), new Vector4(ex, ey, ez, 1.0), groups[gi], res, true, false);
+        if hit && TraceResult.IsValid(res) {
+          let hp: Vector4 = Cast<Vector4>(res.position);
+          let hd: Float = SqrtF((hp.X - sx) * (hp.X - sx) + (hp.Y - sy) * (hp.Y - sy) + (hp.Z - sz2) * (hp.Z - sz2));
+          target = MinF(target, ClampF((hd - this.ITPMSet().collisionMargin) / full, 0.10, 1.0));   // nearest wall of any group
+        }
+        gi += 1;
       }
     }
     if target < this.m_itpColl {
@@ -522,11 +514,36 @@ public func ITPMUpdateTppCam() -> Void {
   let sz: Float = SinF(ph * 0.5);
   let cz: Float = CosF(ph * 0.5);
   cam.SetLocalOrientation(new Quaternion(cz * s, sz * s, sz * c, cz * c));
-  let baseFov: Float = this.ITPMSet().fov;
+  // Free look is automatic: standing still => the mouse orbits the camera around V; as soon as she moves it is normal third person.
+  if this.m_itpMSpeed < 0.25 {
+    this.m_itpStill += 1;
+  } else {
+    this.m_itpStill = 0;
+  }
+  if this.m_itpFree {
+    if this.m_itpMSpeed > 0.8 {
+      this.m_itpFreeMove += 1;
+    } else {
+      this.m_itpFreeMove = 0;
+    }
+    if this.m_itpFreeMove >= 4 {
+      this.ITPMFreeLook(false);                     // she moved: back behind her, normal third person
+    }
+  } else {
+    let auto: Bool = this.m_itpAutoMode == 1 ? true : (this.m_itpAutoMode == 2 ? false : this.ITPMSet().autoFreeLook);
+    if auto && this.m_itpStill >= 20 && !this.m_itpFront {
+      this.ITPMFreeLook(true);
+    }
+  }
+  let baseFov: Float = ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 3);
   let fov: Float = baseFov + (MinF(baseFov, 42.0) - baseFov) * b;
-  if AbsF(fov - this.m_itpFovSet) > 0.05 {
-    (cam as CameraComponent).SetFOV(fov);
-    this.m_itpFovSet = fov;
+  if this.m_itpFovCur <= 1.0 {
+    this.m_itpFovCur = fov;
+  }
+  this.m_itpFovCur += (fov - this.m_itpFovCur) * 0.10;           // ease from the first-person FOV to the third-person FOV
+  if AbsF(this.m_itpFovCur - this.m_itpFovSet) > 0.05 {
+    (cam as CameraComponent).SetFOV(this.m_itpFovCur);
+    this.m_itpFovSet = this.m_itpFovCur;
   }
 }
 
@@ -538,13 +555,23 @@ public func ITPMStartTppCam() -> Bool {
   }
   this.m_itpUseTpp = true;
   this.m_itpFovSet = 0.0;
+  this.m_itpFovCur = 0.0;
+  let fppc: ref<CameraComponent> = this.FindComponentByName(n"camera") as CameraComponent;
+  if IsDefined(fppc) {
+    let ff: Float = fppc.GetFOV();
+    if ff > 20.0 && ff < 150.0 {
+      this.m_itpFovCur = ff;
+      cam.SetFOV(ff);
+      this.m_itpFovSet = ff;
+    }
+  }
   this.m_itpColl = 1.0;
   this.ITPMMotionReset();
   if ITPMCfgKeyDebug() {
     this.ITPMNotify("tppCamera class: " + NameToString(cam.GetClassName()));
   }
   this.ITPMUpdateTppCam();
-  cam.Activate(0.2);
+  cam.Activate(ITPMCfgBlend());
   return true;
 }
 
@@ -581,7 +608,6 @@ public class ITPMStartCallback extends DelayCallback {
     if !IsDefined(p) || !p.m_itpTppOn {
       return;
     }
-    p.ITPMResetCamera();
     if !p.ITPMStartTppCam() {
       p.ITPMNotify("ITPMac: third person is not available for this body");
       p.m_itpWanted = false;
@@ -591,7 +617,11 @@ public class ITPMStartCallback extends DelayCallback {
     // head: the game's own activation event attaches it; do NOT re-equip it here
     let hdc: ref<ITPMHeadDiagCallback> = new ITPMHeadDiagCallback();
     hdc.player = p;
-    GameInstance.GetDelaySystem(p.GetGame()).DelayCallback(hdc, 0.8, true);
+    if ITPMCfgHeadDelay() <= 0.001 {
+      hdc.Call();                                   // send the head's final step right away
+    } else {
+      GameInstance.GetDelaySystem(p.GetGame()).DelayCallback(hdc, ITPMCfgHeadDelay(), true);
+    }
     let cb: ref<ITPMKeepCallback> = new ITPMKeepCallback();
     cb.player = p;
     GameInstance.GetDelaySystem(p.GetGame()).DelayCallback(cb, 0.05, true);
@@ -710,6 +740,13 @@ public func ITPMSetThirdPerson(enable: Bool) -> Void {
     this.m_itpTppOn = true;
     this.m_itpPitch = 0.0;
     this.m_itpPitchS = 0.0;
+    let fppView: ref<IPlacedComponent> = this.FindComponentByName(n"camera") as IPlacedComponent;
+    if IsDefined(fppView) {
+      let fm: Matrix = fppView.GetLocalToWorld();
+      let startPitch: Float = ClampF(Rad2Deg(AsinF(ClampF(fm.Y.Z, -1.0, 1.0))), ITPMCfgPitchMin(), ITPMCfgPitchMax());
+      this.m_itpPitch = startPitch;
+      this.m_itpPitchS = startPitch;
+    }
     this.m_itpEvtY = 0;
     this.m_itpRawMax = 0.0;
     this.m_itpNames = "";
@@ -722,7 +759,11 @@ public func ITPMSetThirdPerson(enable: Bool) -> Void {
     this.QueueEvent(act);
     let cb: ref<ITPMStartCallback> = new ITPMStartCallback();
     cb.player = this;
-    GameInstance.GetDelaySystem(this.GetGame()).DelayCallback(cb, ITPMCfgSnapshotDelay(), true);
+    GameInstance.GetDelaySystem(this.GetGame()).DelayCallback(cb, this.ITPMSet().startDelay, true);
+    // the head's activation step goes out early (20 ms), the camera waits for startDelay; it is sent again when the camera starts
+    let hdEarly: ref<ITPMHeadDiagCallback> = new ITPMHeadDiagCallback();
+    hdEarly.player = this;
+    GameInstance.GetDelaySystem(this.GetGame()).DelayCallback(hdEarly, 0.02, true);
     this.ITPMCustomAnims(true);
     ITPMBridgeSwitch(this, true);
     this.ITPMNotify("ITPMac: third person ON");
@@ -783,6 +824,12 @@ public func ITPMBlockHold() -> Int32 {
   if IsDefined(psm) && psm.GetInt(d.PlayerStateMachine.SceneTier) > 1 {
     hold = Max(hold, 15);                       // cutscene / dialogue / staged scene -> back after 1.5 s
   }
+  if !this.ITPMSet().elevatorTpp && IsDefined(psm) && psm.GetBool(d.PlayerStateMachine.IsPlayerInsideElevator) {
+    hold = Max(hold, 5);                         // inside an elevator -> first person (the cabin walls can be see-through to the camera)
+  }
+  if this.ITPMSet().scannerFpp && IsDefined(psm) && psm.GetInt(d.PlayerStateMachine.Vision) == EnumInt(gamePSMVision.Focus) {
+    hold = Max(hold, 3);                         // scanner / quickhack view (Tab): back after 0.3 s
+  }
   if GameInstance.GetBlackboardSystem(this.GetGame()).Get(d.Braindance).GetBool(d.Braindance.IsActive) {
     hold = Max(hold, 10);
   }
@@ -838,6 +885,41 @@ public func ITPMWrapDeg(a: Float) -> Float {
 }
 
 @addField(PlayerPuppet) public let m_itpColl: Float;      // 0.1..1 how far out the camera may go (wall collision)
+
+// GTA-style movement: while free look is on, V moves relative to the camera's direction instead of her own facing.
+// Uses the original mod's own bridge: Move360 makes the game's locomotion use "camera heading for movement".
+@addMethod(PlayerPuppet)
+public func ITPMMoveRelativeToCamera(on: Bool) -> Void {
+  let bridge: ref<TPPCameraVisibleRenderBridge> = GameInstance.GetScriptableSystemsContainer(this.GetGame()).Get(n"TPPCameraVisibleRenderBridge") as TPPCameraVisibleRenderBridge;
+  if !IsDefined(bridge) {
+    return;
+  }
+  if on {
+    bridge.SetTppActive(true, false, false);    // the bridge only acts while it is told third person is on (heartbeat)
+    bridge.Move360SetAllowed(true);
+  } else {
+    bridge.Move360SetAllowed(false);
+    bridge.SetTppActive(false, false, false);
+  }
+}
+
+@addField(PlayerPuppet) public let m_itpFreeTick: Int32;
+@addField(PlayerPuppet) public let m_itpStill: Int32;       // consecutive ticks with V standing still
+@addField(PlayerPuppet) public let m_itpAutoMode: Int32;    // 0 = use the setting, 1 = auto free look on, 2 = off (set with the free-look key)
+@addField(PlayerPuppet) public let m_itpFreeMove: Int32;   // consecutive ticks with V moving while free look is on
+@addField(PlayerPuppet) public let m_itpWorldYaw: Float;   // free-look camera direction in the WORLD (degrees, counter-clockwise from north)
+
+// V's body yaw in degrees, counter-clockwise positive (0 = +Y). Self-checks the sign of GetWorldYaw against the real forward vector.
+@addMethod(PlayerPuppet)
+public func ITPMBodyYaw() -> Float {
+  let psi: Float = this.GetWorldYaw();
+  let f: Vector4 = this.GetWorldForward();
+  let r: Float = Deg2Rad(psi);
+  let d1: Float = (-SinF(r) - f.X) * (-SinF(r) - f.X) + (CosF(r) - f.Y) * (CosF(r) - f.Y);
+  let d2: Float = (SinF(r) - f.X) * (SinF(r) - f.X) + (CosF(r) - f.Y) * (CosF(r) - f.Y);
+  return d1 <= d2 ? psi : -psi;
+}
+
 @addField(PlayerPuppet) public let m_itpFree: Bool;
 @addField(PlayerPuppet) public let m_itpYaw: Float;       // camera yaw around V in degrees (free look / front view)
 
@@ -853,6 +935,7 @@ public func ITPMFreeLook(on: Bool) -> Void {
     return;
   }
   this.m_itpFree = on;
+  this.m_itpFreeMove = 0;
   if on {
     fpp.yawMaxLeft = 3600.0;
     fpp.yawMaxRight = -3600.0;
@@ -876,8 +959,12 @@ public func ITPMHandleAction(name: CName, action: ListenerAction) -> Bool {
   }
   if Equals(name, n"ITP_FreeLook") {
     if down && this.m_itpUseTpp {
-      this.ITPMFreeLook(!this.m_itpFree);          // toggle: press once to start, again to stop
-      this.ITPMNotify(this.m_itpFree ? "Free look ON" : "Free look OFF");
+      let auto: Bool = this.m_itpAutoMode == 1 ? true : (this.m_itpAutoMode == 2 ? false : this.ITPMSet().autoFreeLook);
+      this.m_itpAutoMode = auto ? 2 : 1;           // switch the automatic free look on/off
+      if auto && this.m_itpFree {
+        this.ITPMFreeLook(false);
+      }
+      this.ITPMNotify(auto ? "Free look when standing: OFF" : "Free look when standing: ON");
     }
     return true;
   }

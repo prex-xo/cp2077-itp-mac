@@ -1,12 +1,20 @@
 #!/bin/zsh
 # Installs the Immersive Third Person Mac port. Only ADDS new files to the game; uninstall.sh removes them again.
-# Usage: ./scripts/install.sh <unzipped original mod folder> [game folder] [--dry-run]
+# Usage: ./scripts/install.sh <unzipped original mod folder> [game folder] [--dry-run] [--no-animations]
 set -eu
 HERE="${0:A:h:h}"
-MOD="${1:-}"; GAME="${2:-$HOME/Library/Application Support/Steam/steamapps/common/Cyberpunk 2077}"; DRY=0
-for a in "$@"; do [[ "$a" == "--dry-run" ]] && DRY=1; done
-[[ "$GAME" == "--dry-run" ]] && GAME="$HOME/Library/Application Support/Steam/steamapps/common/Cyberpunk 2077"
-[[ -n "$MOD" && "$MOD" != "--dry-run" ]] || { echo "usage: $0 <unzipped original mod folder> [game folder] [--dry-run]"; exit 1; }
+DEFAULT_GAME="$HOME/Library/Application Support/Steam/steamapps/common/Cyberpunk 2077"
+MOD=""; GAME=""; DRY=0; ANIM=1
+for a in "$@"; do
+  case "$a" in
+    --dry-run) DRY=1;;
+    --no-animations) ANIM=0;;
+    --*) echo "unknown option $a"; exit 1;;
+    *) if [[ -z "$MOD" ]]; then MOD="$a"; elif [[ -z "$GAME" ]]; then GAME="$a"; fi;;
+  esac
+done
+GAME="${GAME:-$DEFAULT_GAME}"
+[[ -n "$MOD" ]] || { echo "usage: $0 <unzipped original mod folder> [game folder] [--dry-run] [--no-animations]"; exit 1; }
 MOD="${MOD:A}"
 # the unzipped folder may have an extra level (macOS Archive Utility): find the real mod root
 _found="$(find "$MOD" -maxdepth 5 -type d -path '*r6/scripts/immersive_third_person' 2>/dev/null | head -1)"
@@ -27,11 +35,11 @@ if [[ "$DRY" != "1" ]]; then
   done
 fi
 
-echo "1/4 building the Mac scripts ..."
+echo "1/5 building the Mac scripts ..."
 BUILD="$HERE/build"
 python3 -I "$HERE/scripts/make_port.py" "$MOD" "$BUILD"
 
-echo "2/4 test-compiling (nothing is changed in the game) ..."
+echo "2/5 test-compiling (nothing is changed in the game) ..."
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 mkdir -p "$T/r6"
 cp -R "$GAME/r6/scripts" "$T/r6/scripts"; rm -rf "$T/r6/scripts/immersive_third_person"
@@ -43,9 +51,17 @@ if ! grep -q 'Output successfully saved' "$T/scc.log"; then
   die "the scripts do not compile (see above). Nothing was installed."
 fi
 echo "    compiles OK"
+
+if (( ANIM )); then
+  echo "3/5 building the animation swap from your copy of the mod (about 520 MB) ..."
+  python3 -I "$HERE/scripts/build_swap_archive.py" "$ARCH/immersive_third_person.archive" "$HERE/scripts/animset_map.json" "$BUILD/itp_mac_tpp_animsets.archive" | tail -1
+  python3 -I "$HERE/scripts/verify_swap_archive.py" "$BUILD/itp_mac_tpp_animsets.archive" "$ARCH/immersive_third_person.archive" "$HERE/scripts/animset_map.json" | tail -1
+else
+  echo "3/5 animation swap skipped (--no-animations)"
+fi
 [[ "$DRY" == "1" ]] && { echo "dry run finished: nothing installed."; exit 0; }
 
-echo "3/4 copying files into the game ..."
+echo "4/5 copying files into the game ..."
 mkdir -p "$GAME/r6/scripts" "$GAME/r6/tweaks" "$GAME/r6/input" "$GAME/archive/Mac/mod" "$GAME/red4ext/nightcity/mods"
 cp -R "$BUILD/r6/scripts/immersive_third_person" "$GAME/r6/scripts/"
 cp -R "$MOD/r6/tweaks/immersive_third_person" "$GAME/r6/tweaks/"
@@ -54,19 +70,33 @@ for f in immersive_third_person.archive immersive_third_person_v_lipsync_en.arch
   cp "$ARCH/$f" "$GAME/archive/Mac/mod/$f"
   cmp "$ARCH/$f" "$GAME/archive/Mac/mod/$f" || die "copy of $f is corrupt"
 done
+if (( ANIM )); then
+  cp "$BUILD/itp_mac_tpp_animsets.archive" "$GAME/archive/Mac/mod/itp_mac_tpp_animsets.archive"
+  cmp "$BUILD/itp_mac_tpp_animsets.archive" "$GAME/archive/Mac/mod/itp_mac_tpp_animsets.archive" || die "copy of the animation archive is corrupt"
+fi
 # NOTE: immersive_third_person.archive.xl (body patch) is intentionally NOT installed: the port was tested without it.
 
-echo "4/4 writing the mod manifest ..."
-python3 -I - "$GAME" "$GAME/red4ext/nightcity/mods/immersive-third-person-mac-port.json" <<'PY'
+echo "5/5 writing the mod manifest ..."
+python3 -I - "$GAME" "$GAME/red4ext/nightcity/mods/immersive-third-person-mac-port.json" "$ANIM" <<'PY'
 import json, os, sys
-g, m = sys.argv[1:]
+g, m, anim = sys.argv[1:]
 files = [os.path.join(g, "r6/input/itp_mac_input.xml")]
 for d in ("r6/scripts/immersive_third_person", "r6/tweaks/immersive_third_person"):
     for r, _, fs in os.walk(os.path.join(g, d)):
         files += [os.path.join(r, f) for f in fs]
-files += [os.path.join(g, "archive/Mac/mod", f) for f in ("immersive_third_person.archive", "immersive_third_person_v_lipsync_en.archive")]
+names = ["immersive_third_person.archive", "immersive_third_person_v_lipsync_en.archive"] + (["itp_mac_tpp_animsets.archive"] if anim == "1" else [])
+files += [os.path.join(g, "archive/Mac/mod", f) for f in names]
 json.dump({"name": "immersive-third-person-mac-port", "source": "mac port (own patches + your copy of the original mod)", "files": sorted(files)}, open(m, "w"), indent=2)
 PY
 echo
 echo "Done. Start the game with NightCity Console's Play button, load a save, press G."
-echo "Undo any time with ./scripts/uninstall.sh"
+if (( ANIM )); then
+cat <<'NOTE'
+
+NOTE ABOUT ANIMATIONS: the animation swap replaces the game's own animation sets for V (walking, running, idle, jumping, ...)
+with the mod's third-person versions, in BOTH first and third person. It is an extra file (archive/Mac/mod/itp_mac_tpp_animsets.archive);
+no game file is edited. If anything looks wrong with V's animations, switch it off with:
+    ./scripts/animations.sh off        (and back on with: ./scripts/animations.sh on)
+NOTE
+fi
+echo "Remove everything any time with ./scripts/uninstall.sh"
