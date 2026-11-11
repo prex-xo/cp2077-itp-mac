@@ -120,6 +120,21 @@ Two possible routes:
 
 Anyone who knows how the DLL swaps animation sets is very welcome to get in touch.
 
+## Future plan: NightCity Console "Optional Mods"
+
+NightCity Console ships a set of **Optional Mods** (ported mods that install from inside the app, no manual steps):
+see [`native25/optional-mods`](https://github.com/ysrdevs/nightcity-console-mac/tree/main/native25/optional-mods)
+in its repository.
+
+The plan is to propose this port there as a **pull request**, so that in the end you won't need to clone this repo or run any
+script: you would pick it in NightCity Console. Nothing has been submitted yet, and whether and how it gets accepted is up to
+NightCity Console's maintainer. Until then, this repository is the way to install it.
+
+NightCity Console links:
+- Project: https://github.com/ysrdevs/nightcity-console-mac
+- Releases (downloads): https://github.com/ysrdevs/nightcity-console-mac/releases
+- Optional mods folder: https://github.com/ysrdevs/nightcity-console-mac/tree/main/native25/optional-mods
+
 ## Notes
 
 - Do not mix with other mods that replace the player's entity or animation graph.
