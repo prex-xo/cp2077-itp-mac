@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- Immersive Third Person (Mac port) hotkeys, loaded by Input Loader. Change a key by editing the IK_ name.
+     Defaults (all unused by the game): , = quick first person (hold)   ; = shoulder zoom (hold)
+     ' = front view (hold)   [ = previous camera profile   ] = next camera profile   . = free look (hold, reserved) -->
+<bindings>
+    <mapping name="ITP_QuickFpp_Button" type="Button">
+        <button id="IK_Comma" />
+    </mapping>
+    <mapping name="ITP_Shoulder_Button" type="Button">
+        <button id="IK_Semicolon" />
+    </mapping>
+    <mapping name="ITP_Front_Button" type="Button">
+        <button id="IK_SingleQuote" />
+    </mapping>
+    <mapping name="ITP_ProfilePrev_Button" type="Button">
+        <button id="IK_LeftBracket" />
+    </mapping>
+    <mapping name="ITP_ProfileNext_Button" type="Button">
+        <button id="IK_RightBracket" />
+    </mapping>
+    <mapping name="ITP_FreeLook_Button" type="Button">
+        <button id="IK_Period" />
+    </mapping>
+
+    <context name="ITPMacContext">
+        <action name="ITP_QuickFpp" map="ITP_QuickFpp_Button" />
+        <action name="ITP_Shoulder" map="ITP_Shoulder_Button" />
+        <action name="ITP_Front" map="ITP_Front_Button" />
+        <action name="ITP_ProfilePrev" map="ITP_ProfilePrev_Button" />
+        <action name="ITP_ProfileNext" map="ITP_ProfileNext_Button" />
+        <action name="ITP_FreeLook" map="ITP_FreeLook_Button" />
+    </context>
+
+    <context name="Locomotion" append="true">
+        <include name="ITPMacContext" />
+    </context>
+</bindings>

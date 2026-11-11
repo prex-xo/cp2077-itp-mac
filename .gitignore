@@ -1,0 +1,13 @@
+# allowlist: only our own code and docs are ever committed
+*
+!.gitignore
+!README.md
+!NOTES.md
+!LICENSE
+!port/
+!port/*.reds
+!port/input/
+!port/input/*.xml
+!scripts/
+!scripts/*.sh
+!scripts/*.py
