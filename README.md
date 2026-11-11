@@ -14,8 +14,8 @@ This repository only contains the small amount of glue code needed to make that 
 - Ported from version **2.0.1**.
 - **This repository contains none of the original mod's files.** You download them yourself from Nexus (see below).
   That is on purpose: it is CybrDrake's work, not mine to redistribute.
-- Personal use only. This repo is private. A public release would need CybrDrake's permission, and I will ask before ever doing that.
-  If CybrDrake would like this removed or changed, I will do it.
+- This is a fan port for personal, single-player use. It needs the original mod to work, so please download it from CybrDrake's
+  Nexus page (and endorse it there if you like it): everything that matters here is their work.
 
 ## What works (status)
 
@@ -38,7 +38,7 @@ Roughly **60% of the whole port** is done. The part you use every day (camera an
 ## Requirements
 
 - A Mac with **Cyberpunk 2077 from Steam, native macOS version, patch 2.5.0 (build 5814786)**. Only that build was tested.
-- **NightCity Console for Mac 1.9.0** by ysrdevs (provides RED4ext, ArchiveXL, TweakXL, Codeware, Input Loader and Mod Settings for the Mac game):
+- **NightCity Console for Mac 1.9.0** (the app *NightCity Console*) by ysrdevs (provides RED4ext, ArchiveXL, TweakXL, Codeware, Input Loader and Mod Settings for the Mac game):
   https://github.com/ysrdevs/nightcity-console-mac/releases
 - The original mod from Nexus (free Nexus account): https://www.nexusmods.com/cyberpunk2077/mods/32203
   Download the main file **"Immersive Third Person V2" 2.0.1** and unzip it somewhere. It is a big download (about 1.2 GB).
@@ -46,9 +46,10 @@ Roughly **60% of the whole port** is done. The part you use every day (camera an
 
 ## Install: step by step
 
-1. **Install NightCity Console 1.9.0.** Follow its own instructions. Put `ncc.app` inside the game folder, so you have
-   `~/Library/Application Support/Steam/steamapps/common/Cyberpunk 2077/ncc.app`. Open it and press **Play once**. This installs the
-   frameworks into the game (`red4ext/plugins/ArchiveXL`, `input_loader`, `ModSettings`, ...). Quit the game afterwards.
+1. **Install NightCity Console 1.9.0** (the app is called **NightCity Console**; see its releases page for the download and its own instructions).
+   It can stay wherever you put it (for example `/Applications`); it does **not** have to go into the game folder.
+   Open it and press **Play once**. This installs the frameworks into the game folder (`red4ext/plugins/ArchiveXL`, `input_loader`, `ModSettings`, ...).
+   Quit the game afterwards.
 2. **Download and unzip the original mod** from the Nexus link above. Remember the folder it unzipped to.
 3. **Clone this repo:**
    ```sh

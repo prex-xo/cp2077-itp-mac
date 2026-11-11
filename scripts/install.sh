@@ -11,8 +11,7 @@ MOD="${MOD:A}"
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 [[ -x "$GAME/engine/tools/scc" ]] || die "game not found at: $GAME (pass the game folder as 2nd argument)"
-[[ -d "$GAME/ncc.app" ]] || die "NightCity Console not found at $GAME/ncc.app. Install NightCity Console 1.9.0, put it in the game folder, and press Play once (see README)."
-[[ -d "$GAME/red4ext/plugins/ArchiveXL" && -d "$GAME/red4ext/plugins/input_loader" && -d "$GAME/red4ext/plugins/ModSettings" ]] || die "NightCity Console's frameworks are not installed yet: open it and press Play once."
+[[ -d "$GAME/red4ext/plugins/ArchiveXL" && -d "$GAME/red4ext/plugins/input_loader" && -d "$GAME/red4ext/plugins/ModSettings" ]] || die "NightCity Console's frameworks are not installed in the game yet: open the NightCity Console app and press Play once, then quit the game and run this again."
 build="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$GAME/Cyberpunk2077.app/Contents/Info.plist" 2>/dev/null || true)"
 [[ "$build" == "5814786" ]] || echo "WARNING: game build is '$build', this was made for 5814786 (2.5.0)."
 [[ "$DRY" != "1" ]] && pgrep -x Cyberpunk2077 >/dev/null && die "the game is running: quit it first."
