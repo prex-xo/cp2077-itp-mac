@@ -1,98 +1,83 @@
-# Immersive Third Person for Cyberpunk 2077 on Mac (unofficial port kit)
+# Immersive Third Person for Cyberpunk 2077 on Mac
 
-A personal-use port of **Immersive Third Person – Best Of Both Worlds** to the native macOS version of Cyberpunk 2077,
-running on [NightCity Console for Mac](https://github.com/ysrdevs/nightcity-console-mac).
+Third-person camera for the **native Mac version** of Cyberpunk 2077. It is an unofficial port of the PC mod
+**Immersive Third Person - Best Of Both Worlds** by CybrDrake, running on [NightCity Console for Mac](https://github.com/ysrdevs/nightcity-console-mac).
 
 ## Credit: this is CybrDrake's mod
 
 **All the original work belongs to [CybrDrake](https://www.nexusmods.com/cyberpunk2077/mods/32203).**
-The camera system, the animation graph and animations, the scripts, the art and the whole design are theirs.
-This repository only contains the small amount of glue code needed to make that mod run on a Mac, and it is
-**not affiliated with or endorsed by CybrDrake**.
+The camera system, the animations, the scripts and the design are theirs. This repo only contains the glue code that makes their mod run on a Mac.
+It is **not affiliated with or endorsed by CybrDrake**.
 
-- Original mod (Nexus): https://www.nexusmods.com/cyberpunk2077/mods/32203
-- Ported from version **2.0.1**.
-- **This repository contains none of the original mod's files.** You download them yourself from Nexus (see below).
-  That is on purpose: it is CybrDrake's work, not mine to redistribute.
-- This is a fan port for personal, single-player use. It needs the original mod to work, so please download it from CybrDrake's
-  Nexus page (and endorse it there if you like it): everything that matters here is their work.
+- Original mod (Nexus): https://www.nexusmods.com/cyberpunk2077/mods/32203 (ported from version **2.0.1**)
+- **This repo contains none of the original mod's files.** You download them yourself from Nexus, and the installer builds the Mac version from your copy.
+- Please endorse the original mod on Nexus if you like it. It is a fan port for personal, single-player use.
 
 ## Demo video
 
 [![Watch the demo video](https://img.youtube.com/vi/Qqs_4r0ztXE/hqdefault.jpg)](https://youtu.be/Qqs_4r0ztXE)
 
-Video: https://youtu.be/Qqs_4r0ztXE (unlisted on YouTube, so it is only reachable from this link).
+(Unlisted on YouTube, so it is only reachable from this link: https://youtu.be/Qqs_4r0ztXE)
 
-## What works (status)
+## What you get
 
-Roughly **80% of the whole port** is done, and everything you use day to day works. What is left is mostly optional.
+Press **G** to switch between first and third person. Everything below works:
 
-| Feature | Status |
-|---|---|
-| Toggle third person (G) with a smooth glide in and a smooth glide back | works |
-| Third-person camera (the original's separate `tppCamera`), head and clothes | works |
-| Automatic first person: weapon drawn, combat, takedowns, vehicles, cutscenes and dialogue, braindance, scanner / quickhack view (Tab), elevators, terminals and devices, sitting and other workspots, other bodies (e.g. behavioral imprint) | works (returning after the long imprint mission untested) |
-| 5 camera profiles, each with its own side / distance / height / FOV in the settings menu, plus an "Active camera profile" selector | works |
-| Shoulder zoom, front view, quick first person | works |
-| **Free look** (`.` key; ends by itself when V moves) | works |
-| Wall collision (camera pulls in at walls, but keeps the head visible) | works (static world and visibility geometry; not cars/props) |
-| Camera motion: dynamic distance, walking bob, shake, crouch/sprint height, slide tilt, landing shake | works |
-| Settings menu and **key bindings page** (Mod Settings) | works |
-| **Animations** (the mod's third-person animation sets, installed as extra archives) | works, see the animation note below |
-| Dash, healing / consumable animation (woman), optional auto-vault | works |
-| Loot-pickup hand animation, idle fidgets | not done (their clips are in the sets that made the first-person aim shift) |
-| 360° / GTA-style movement, head guard, scene redirect, aim spine fix | not done (done by the original's Windows DLL; optional) |
+- **Smooth switching** into and out of third person.
+- **Automatic first person** when it makes sense: weapon drawn, combat, vehicles, cutscenes and dialogue, scanner / quickhacks (Tab), elevators, terminals, sitting down, and when you control someone else (like the behavioral imprint).
+- **5 camera profiles** you can edit, **shoulder zoom**, **front view**, **quick first-person peek**, and **free look**.
+- The camera **pulls in at walls** instead of going through them.
+- **Camera motion**: bob when walking, shake when running, drop when crouching or sliding, lean when sliding, bump when landing hard.
+- **The mod's animations**: dash, healing animation (woman), idle animations, and an optional **auto vault** while sprinting.
+- A **settings page** in the game and **rebindable keys**.
 
-## Requirements
+## Known issues
 
-- A Mac with **Cyberpunk 2077 from Steam, native macOS version, patch 2.5.0 (build 5814786)**. Only that build was tested.
-- **NightCity Console for Mac 1.9.0** (the app *NightCity Console*) by ysrdevs (provides RED4ext, ArchiveXL, TweakXL, Codeware, Input Loader and Mod Settings for the Mac game):
-  https://github.com/ysrdevs/nightcity-console-mac/releases
-- The original mod from Nexus (free Nexus account): https://www.nexusmods.com/cyberpunk2077/mods/32203
-  Download the main file **"Immersive Third Person V2" 2.0.1** and unzip it somewhere. It is a big download (about 1.2 GB).
-- Python 3 (comes with the Xcode command line tools: run `xcode-select --install` if `python3` is missing).
+- **The head appears a little late** when you switch to third person (the game takes a moment to load her head). This will be improved in a future update.
+- Tested mostly with **female V**. Male V works the same way, but has not been tested as much, and the healing animation only exists for female V (the original mod has none for male V).
+- Tested by one person on one Mac (Apple M5 Pro, macOS 27.2). Expect some rough edges.
 
-## Install: step by step
+## What is not ported
 
-1. **Install NightCity Console 1.9.0:** download it from its releases page, drag **NightCity Console** into your Applications folder and open it
-   (it does **not** have to go into the game folder). In the app, click **Install**. This installs the runtime and frameworks into the game
-   (`red4ext/plugins/ArchiveXL`, `input_loader`, `ModSettings`, ..., the script compiler, and re-signs the game binary so mods can load).
-   Then click **Play** once to check that the game starts, and quit the game. NightCity Console has an install video and a guide in the app.
-2. **Download and unzip the original mod** from the Nexus link above. Remember the folder it unzipped to.
-3. **Clone this repo:**
+The original mod also has a small Windows program (a DLL) that does a few extra jobs. Those are **not ported**, because a Windows DLL cannot run on a Mac:
+
+- GTA-style "run in any direction relative to the camera" movement,
+- the head render guard,
+- third person during cutscenes (the "scene redirect"),
+- a fix for the spine bending while aiming.
+
+These are optional edge cases: this port goes to first person for weapons, scenes and vehicles anyway. The loot-pickup hand animation is also not included.
+
+## What you need
+
+- A Mac with **Cyberpunk 2077 from Steam (native macOS), patch 2.5.0**. Only that version was tested.
+- **NightCity Console for Mac 1.9.0** (by ysrdevs): https://github.com/ysrdevs/nightcity-console-mac/releases
+- The **original mod** from Nexus (free account): https://www.nexusmods.com/cyberpunk2077/mods/32203
+  Download the main file **"Immersive Third Person V2" 2.0.1** and unzip it somewhere (about 1.2 GB).
+- Python 3 (it comes with the Xcode command line tools: run `xcode-select --install` if `python3` is missing).
+
+## Install
+
+1. **Install NightCity Console.** Drag the app to your Applications folder and open it. Click **Install**, then click **Play** once to check that the game starts. Quit the game.
+2. **Download and unzip the original mod** from the Nexus link above.
+3. **Get this repo:**
    ```sh
    git clone https://github.com/prex-xo/cp2077-itp-mac.git
    cd cp2077-itp-mac
    ```
-4. **Run the installer**, giving it the unzipped mod folder. Try the dry run first: it builds and test-compiles but changes nothing in the game.
+4. **Run the installer** with the folder you unzipped (add `--dry-run` first if you want to check without changing anything):
    ```sh
-   ./scripts/install.sh "/path/to/unzipped/mod" --dry-run
    ./scripts/install.sh "/path/to/unzipped/mod"
    ```
-   What it does: reads the original's scripts from *your* folder, applies the Mac patches from `scripts/make_port.py`, adds our own three files,
-   test-compiles everything with the game's script compiler, then copies into the game:
-   - `r6/scripts/immersive_third_person/` (original scripts, patched, plus our `zz_itp_mac_*.reds`)
-   - `r6/tweaks/immersive_third_person/` (original tweak files)
-   - `r6/input/itp_mac_input.xml` (our hotkeys, loaded by Input Loader)
-   - `archive/Mac/mod/immersive_third_person.archive` and `..._v_lipsync_en.archive` (original's archives: they contain the third-person camera component and the animation graph)
-   - `archive/Mac/mod/itp_mac_tpp_animsets.archive` (the animation swap, **built on your Mac from your copy of the mod**, see the note below; use `--no-animations` to skip it)
-   - a manifest in `red4ext/nightcity/mods/`
-   It only **adds** files; it never overwrites game files.
-5. **Start the game with NightCity Console's Play button** (not directly from Steam: mods only load when NightCity Console starts the game). NCC compiles the scripts and starts the game with the frameworks injected.
-   Make a manual save first the first time.
-6. **In game:** load a save and press **G**.
+   It builds the Mac scripts from your copy, test-compiles them, and copies everything into the game. It only **adds** files and never overwrites game files.
+   It asks if you want the animation swap (see below).
+5. **Start the game with NightCity Console's Play button** (not directly from Steam), load a save, and press **G**.
 
-To remove everything: `./scripts/uninstall.sh`.
+To remove everything: `./scripts/uninstall.sh`
 
-**After a game or NightCity Console update:** click **Install** (or "Reinstall NightCity Console") in the app again. If the mod stops loading, run
-`./scripts/uninstall.sh` and then `./scripts/install.sh ...` again. NightCity Console blocks mod changes while the game is running, and so does the installer.
+If the installer says the scripts do not compile, you probably have a different version of the mod or the game. Please send me the error text.
 
-If the installer says the scripts don't compile, you most likely have a different version of the original mod or of the game. Send me the error text.
-
-## Updating from an older version
-
-If you already installed an earlier version, update like this (your Mod Settings values are kept, except the old single side / distance / height / FOV
-settings, which became one page per camera profile):
+## Updating
 
 ```sh
 cd cp2077-itp-mac
@@ -100,88 +85,63 @@ git pull
 ./scripts/update.sh "/path/to/unzipped/mod"
 ```
 
-`update.sh` removes the old install and installs the new one (it asks whether you want the animation swap). Quit the game first.
-If you prefer, run `./scripts/uninstall.sh` and then `./scripts/install.sh "/path/to/unzipped/mod"` yourself.
+Quit the game first. Your settings are kept. After a game or NightCity Console update, click **Install** in NightCity Console again.
 
 ## Controls
 
-Third person is toggled with the game's walk-toggle key (**G** by default). The other keys come from `r6/input/itp_mac_input.xml`
-(they were chosen because the game leaves them unused):
+**G** switches third person on and off (it is the game's own walk-toggle key). The other keys:
 
-| Key | Action |
+| Key | What it does |
 |---|---|
-| `G` | third person on/off |
-| `.` | free look on/off (camera orbits around V; it ends by itself when she moves) |
+| `.` | free look on/off (it ends by itself when V moves) |
 | `,` | quick first person (hold) |
 | `;` | shoulder zoom (hold) |
 | `'` | front view (hold) |
-| `[` / `]` | previous / next camera profile (5) |
+| `[` and `]` | previous / next camera profile |
 
-**Change the keys in the game:** **Settings → Mod Settings → Immersive Third Person → Key bindings**. Turn on *Use these key bindings*, then pick a key for
-each action. While it is on, the key file's default keys stop working. Pick keys the game does not use (M = map, J = journal and I = inventory would do both things).
+**Change the keys:** in the game, go to **Settings → Mod Settings → Immersive Third Person → Key bindings**, turn on *Use these key bindings*, and pick a key for each action.
+Choose keys the game does not use (M = map, J = journal and I = inventory would do both things).
 
-Settings are in the game's **Settings → Mod Settings → Immersive Third Person** page: key bindings, an **Active camera profile** selector (shows which of the 5 profiles is on and follows the `[` `]` keys),
-one page per camera profile (side, distance, height, FOV), the camera (start delay, transition time, closest camera distance, wall collision), look speeds, first person in the scanner, in elevators and in combat,
-camera motion, gameplay animations (including **Auto vault while sprinting**, off by default), and on-screen messages.
+**Other settings** are on the same page: camera profiles (side, distance, height, FOV), transition time, how close the camera may come to a wall,
+look speed, first person in combat / scanner / elevators, camera motion, auto vault (off by default), and on-screen messages.
 
-## Animations: please read
+## The animation swap: please read
 
-The mod's big feature is full-body third-person animation. On Windows a DLL swaps the animation sets in memory; a Windows DLL cannot run on Mac.
-So the installer does the swap **statically**: it builds two extra archives from your copy of the mod:
-- `archive/Mac/mod/itp_mac_tpp_animsets.archive` (about 410 MB, 601 animation sets) replaces the game's own animation sets for V;
-- `archive/Mac/mod/itp_mac_consumables.archive` (6 MB, woman only) adds the third-person healing / consumable clips, taking the place of the rarely used "blunt dildo" weapon animation set.
+On Windows, a DLL swaps the mod's animations in while you play. That is not possible on a Mac, so the installer does it **once, before the game starts**:
+it builds two extra files from your copy of the mod and puts them next to the game's files:
 
-- **No game file is edited.** They are extra files that the game loads after its own archives.
-- They affect **first and third person**, because there is no live switching on Mac. In testing, first person looked fine and third person got
-  the mod's movement, but **if anything looks wrong with V's animations, switch it off**:
-  ```sh
-  ./scripts/animations.sh off      # back to the game's own animations (the files are only renamed)
-  ./scripts/animations.sh on       # on again
-  ./scripts/animations.sh status
-  ```
-  Quit the game first. Prefer clicking? Double-click **`scripts/Animations OFF.command`** (or **`Animations ON.command`**).
-  The installer also asks whether you want the animation swap; `--no-animations` skips it, `--yes` answers yes without asking.
-  (A Mod Settings switch is not possible: the game loads its archives when it starts, so an in-game menu cannot turn one off.)
-- The game's four main locomotion sets and the gun / aim sets are deliberately **not** swapped: with them the first-person aim shifted while fighting.
-- Everything else (camera, free look, settings) works with the animation swap on or off.
+- `itp_mac_tpp_animsets.archive` (about 410 MB): the mod's animations for V.
+- `itp_mac_consumables.archive` (6 MB, female V only): the healing animation.
+
+No game file is edited. The swap also applies in first person (it cannot change while you play). In testing, first person looked normal, but if **anything looks wrong with V's animations, switch it off**:
+
+```sh
+./scripts/animations.sh off      # back to the game's own animations (files are only renamed)
+./scripts/animations.sh on       # on again
+```
+
+Quit the game first. You can also double-click **`scripts/Animations OFF.command`** or **`Animations ON.command`**.
+You can skip the swap at install time with `--no-animations`. The rest of the mod (camera, free look, settings) works with the swap on or off.
 
 ## How it works (short)
 
-- The original mod = Lua brain (Cyber Engine Tweaks, Windows only) + redscript + archives + a Windows DLL. Mac has no CET and cannot load the DLL.
-- The original's **redscript and archives run on Mac almost unchanged**; only a few functions from the Windows Codeware are missing, which `make_port.py` patches.
-- The Lua "brain" is re-implemented here in redscript (`port/itp_mac_camera.reds`), using the original's own separate `tppCamera` component
-  (so the game's normal camera is never fought) and the same formulas. Settings are `port/itp_mac_settings.reds`.
-- Several formulas and default values (camera offsets, shoulder zoom, camera-motion maths) are re-implemented from reading the original's `init.lua` and `camera_motion.lua`: the design is CybrDrake's.
-- The DLL's features are **not** ported yet. See below.
+- The original mod = a Lua script (Windows only) + game scripts + archives + a Windows DLL. A Mac has no Lua mod loader and cannot run the DLL.
+- The original's game scripts and archives run on a Mac almost unchanged. A small patch script fixes the few Windows-only calls.
+- The Lua part is rewritten here as game scripts (`port/`). It uses the original's own separate third-person camera and the same numbers and formulas.
+  The design is CybrDrake's.
+- More technical notes are in [NOTES.md](NOTES.md).
 
-## What is left
+## Plan: NightCity Console "Optional Mods"
 
-**Animations (works as a static swap).** The original ships ~1,390 third-person animation sets and its Windows DLL swaps them in **live**. Here the same job is done statically (see above).
-Not done: the loot-pickup hand animation and idle fidgets (they live in the main locomotion sets), consumable clips for a man (the mod has none), and live switching between first- and
-third-person versions. A native Mac RED4ext plugin could do the live swap like the DLL (needs disassembling the DLL; much easier with the author's help).
+NightCity Console has an **Optional Mods** section (mods that install from inside the app). The plan is to propose this port there as a pull request, so that in the end you would not need
+to clone this repo or run a script. Nothing is submitted yet, and it is up to NightCity Console's maintainer. Until then, this repo is the way to install it.
 
-**The DLL's other features (optional, not done):** 360° / GTA-style movement, head render guard, scene redirect (third person during cutscenes), the aim spine bug.
-They only matter in edge cases (this port switches to first person with a weapon, in scenes and in vehicles anyway).
-
-Anyone who knows how the DLL swaps animation sets is very welcome to get in touch.
-
-## Future plan: NightCity Console "Optional Mods"
-
-NightCity Console ships a set of **Optional Mods** (ported mods that install from inside the app, no manual steps):
-see [`native25/optional-mods`](https://github.com/ysrdevs/nightcity-console-mac/tree/main/native25/optional-mods)
-in its repository.
-
-The plan is to propose this port there as a **pull request**, so that in the end you won't need to clone this repo or run any
-script: you would pick it in NightCity Console. Nothing has been submitted yet, and whether and how it gets accepted is up to
-NightCity Console's maintainer. Until then, this repository is the way to install it.
-
-NightCity Console links:
-- Project: https://github.com/ysrdevs/nightcity-console-mac
-- Releases (downloads): https://github.com/ysrdevs/nightcity-console-mac/releases
-- Optional mods folder: https://github.com/ysrdevs/nightcity-console-mac/tree/main/native25/optional-mods
+- NightCity Console: https://github.com/ysrdevs/nightcity-console-mac
+- Its releases: https://github.com/ysrdevs/nightcity-console-mac/releases
+- Its optional mods folder: https://github.com/ysrdevs/nightcity-console-mac/tree/main/native25/optional-mods
 
 ## Notes
 
-- Do not mix with other mods that replace the player's entity or animation graph.
-- Only tested by one person on one machine (Apple M5 Pro, macOS 27.2). Expect rough edges.
-- Everything here is for single-player, personal use, on your own legally owned copy of the game.
+- Do not mix this with other mods that replace the player's entity or animation graph.
+- For single-player, personal use, on your own legally owned copy of the game.
+- If anyone knows how the original DLL swaps animations while playing, you are very welcome to get in touch.
