@@ -15,18 +15,36 @@ public class ITPMSettings {
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera")
+  @runtimeProperty("ModSettings.displayName", "Transition time")
+  @runtimeProperty("ModSettings.description", "How long the camera glides from first person to behind V (seconds). V's head model needs a moment to appear; a longer glide hides that wait.")
+  @runtimeProperty("ModSettings.step", "0.05")
+  @runtimeProperty("ModSettings.min", "0.1")
+  @runtimeProperty("ModSettings.max", "1.5")
+  public let blendTime: Float = 0.7;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera")
   @runtimeProperty("ModSettings.displayName", "Camera start delay")
   @runtimeProperty("ModSettings.description", "Seconds the camera waits after you press the toggle key, so V's head can appear first. Lower = faster camera, higher = head ready sooner than the camera moves.")
   @runtimeProperty("ModSettings.step", "0.05")
   @runtimeProperty("ModSettings.min", "0.0")
   @runtimeProperty("ModSettings.max", "0.8")
-  public let startDelay: Float = 0.15;
+  public let startDelay: Float = 0.10;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera")
   @runtimeProperty("ModSettings.displayName", "Wall collision")
   @runtimeProperty("ModSettings.description", "The camera moves closer to V instead of going through walls.")
   public let collision: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera")
+  @runtimeProperty("ModSettings.displayName", "Closest camera distance")
+  @runtimeProperty("ModSettings.description", "The camera never comes closer to V's head than this when a wall is in the way (metres). Too small and the game hides V's head.")
+  @runtimeProperty("ModSettings.step", "0.05")
+  @runtimeProperty("ModSettings.min", "0.2")
+  @runtimeProperty("ModSettings.max", "1.5")
+  public let minDistance: Float = 0.70;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera")

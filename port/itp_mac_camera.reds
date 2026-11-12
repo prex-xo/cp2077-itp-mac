@@ -36,7 +36,12 @@ public func ITPMCfgBlend() -> Float { return 0.3; }            // camera blend t
 @addField(PlayerPuppet) public let m_itpFront: Bool;         // hold: front view
 @addField(PlayerPuppet) public let m_itpQuick: Bool;         // hold: quick first person
 @addField(PlayerPuppet) public let m_itpFovSet: Float;
-@addField(PlayerPuppet) public let m_itpFovCur: Float;   // using the mod's own tppCamera component
+@addField(PlayerPuppet) public let m_itpFovCur: Float;
+@addField(PlayerPuppet) public let m_itpGlide: Bool;        // our own first-person -> third-person glide is running
+@addField(PlayerPuppet) public let m_itpGlideT0: Float;
+@addField(PlayerPuppet) public let m_itpGSX: Float;         // glide start = the first-person camera, in V's body frame (x right, y forward, z up)
+@addField(PlayerPuppet) public let m_itpGSY: Float;
+@addField(PlayerPuppet) public let m_itpGSZ: Float;   // using the mod's own tppCamera component
 @addField(PlayerPuppet) public let m_itpSetSince: Bool;
 @addField(PlayerPuppet) public let m_itpSkips: Int32;
 @addField(PlayerPuppet) public let m_itpPrevW: Vector4;
@@ -123,9 +128,16 @@ public func ITPMEquipTppHead(equip: Bool, verbose: Bool) -> Bool {
   if !equip {
     return ts.RemoveItemFromSlot(this, slot, true, true, true);
   }
-  let rec: TweakDBID = t"Items.PlayerWaTppHead";
+  // like the original mod: its own clone of the game's TPP head item (defined in r6/tweaks/immersive_third_person/tpp_head.yaml), else the game's
+  let rec: TweakDBID = t"Items.ImmersiveThirdPersonWaTppHead";
   if Equals(this.GetResolvedGenderName(), n"Male") {
-    rec = t"Items.PlayerMaTppHead";
+    rec = t"Items.ImmersiveThirdPersonMaTppHead";
+  }
+  if !IsDefined(TweakDBInterface.GetItemRecord(rec)) {
+    rec = t"Items.PlayerWaTppHead";
+    if Equals(this.GetResolvedGenderName(), n"Male") {
+      rec = t"Items.PlayerMaTppHead";
+    }
   }
   let id: ItemID = ItemID.FromTDBID(rec);
   let gave: Bool = false;
@@ -140,6 +152,7 @@ public func ITPMEquipTppHead(equip: Bool, verbose: Bool) -> Bool {
   }
   return added;
 }
+
 
 public class ITPMHeadRetryCallback extends DelayCallback {
   public let player: wref<PlayerPuppet>;
@@ -158,7 +171,7 @@ public class ITPMHeadRetryCallback extends DelayCallback {
       let cb: ref<ITPMHeadRetryCallback> = new ITPMHeadRetryCallback();
       cb.player = p;
       cb.attempt = this.attempt + 1;
-      GameInstance.GetDelaySystem(p.GetGame()).DelayCallback(cb, 0.5, true);
+      GameInstance.GetDelaySystem(p.GetGame()).DelayCallback(cb, 0.15, true);
     }
   }
 }
@@ -529,7 +542,7 @@ public func ITPMUpdateTppCam() -> Void {
         if hit && TraceResult.IsValid(res) {
           let hp: Vector4 = Cast<Vector4>(res.position);
           let hd: Float = SqrtF((hp.X - sx) * (hp.X - sx) + (hp.Y - sy) * (hp.Y - sy) + (hp.Z - sz2) * (hp.Z - sz2));
-          target = MinF(target, ClampF((hd - this.ITPMSet().collisionMargin) / full, 0.10, 1.0));   // nearest wall of any group
+          target = MinF(target, ClampF((hd - this.ITPMSet().collisionMargin) / full, ClampF(this.ITPMSet().minDistance / full, 0.10, 1.0), 1.0));   // nearest wall of any group
         }
         gi += 1;
       }
@@ -542,6 +555,19 @@ public func ITPMUpdateTppCam() -> Void {
     lx = lx * this.m_itpColl;
     ly = ly * this.m_itpColl;
     z = pz + (z - pz) * this.m_itpColl;
+  }
+  if this.m_itpGlide {
+    // our own glide from the first-person camera spot to the final spot: starts exactly where the first-person camera is,
+    // pulls straight back, the shoulder offset eases in on the way (no sideways slide, no weird angle)
+    let gt: Float = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGame())) - this.m_itpGlideT0;
+    let g: Float = ClampF(gt / MaxF(this.ITPMSet().blendTime, 0.1), 0.0, 1.0);
+    let e: Float = g * g * (3.0 - 2.0 * g);
+    lx = this.m_itpGSX + (lx - this.m_itpGSX) * e;
+    ly = this.m_itpGSY + (ly - this.m_itpGSY) * e;
+    z = this.m_itpGSZ + (z - this.m_itpGSZ) * e;
+    if g >= 1.0 {
+      this.m_itpGlide = false;
+    }
   }
   cam.SetLocalPosition(new Vector4(lx, ly, z, 1.0));
   let sz: Float = SinF(ph * 0.5);
@@ -573,7 +599,7 @@ public func ITPMUpdateTppCam() -> Void {
   if this.m_itpFovCur <= 1.0 {
     this.m_itpFovCur = fov;
   }
-  this.m_itpFovCur += (fov - this.m_itpFovCur) * 0.10;           // ease from the first-person FOV to the third-person FOV
+  this.m_itpFovCur += (fov - this.m_itpFovCur) * ClampF(0.010 / MaxF(this.ITPMSet().blendTime, 0.1) * 3.0, 0.02, 0.30);   // ease from the first-person FOV to the third-person FOV over about the glide time
   if AbsF(this.m_itpFovCur - this.m_itpFovSet) > 0.05 {
     (cam as CameraComponent).SetFOV(this.m_itpFovCur);
     this.m_itpFovSet = this.m_itpFovCur;
@@ -600,11 +626,29 @@ public func ITPMStartTppCam() -> Bool {
   }
   this.m_itpColl = 1.0;
   this.ITPMMotionReset();
+  // where is the first-person camera, in V's body frame?
+  this.m_itpGlide = false;
+  let fcam: ref<IPlacedComponent> = this.FindComponentByName(n"camera") as IPlacedComponent;
+  let pf: Vector4 = this.GetWorldForward();
+  let pfl: Float = SqrtF(pf.X * pf.X + pf.Y * pf.Y);
+  if IsDefined(fcam) && pfl > 0.001 {
+    let fm: Matrix = fcam.GetLocalToWorld();
+    let pp: Vector4 = this.GetWorldPosition();
+    let fx0: Float = pf.X / pfl;
+    let fy0: Float = pf.Y / pfl;
+    let ddx: Float = fm.W.X - pp.X;
+    let ddy: Float = fm.W.Y - pp.Y;
+    this.m_itpGSX = ddx * fy0 - ddy * fx0;
+    this.m_itpGSY = ddx * fx0 + ddy * fy0;
+    this.m_itpGSZ = fm.W.Z - pp.Z;
+    this.m_itpGlideT0 = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGame()));
+    this.m_itpGlide = true;
+  }
   if ITPMCfgKeyDebug() {
     this.ITPMNotify("tppCamera class: " + NameToString(cam.GetClassName()));
   }
   this.ITPMUpdateTppCam();
-  cam.Activate(ITPMCfgBlend());
+  cam.Activate(this.m_itpGlide ? 0.0 : this.ITPMSet().blendTime);   // with our own glide there is no engine blend
   return true;
 }
 
@@ -729,6 +773,7 @@ public class ITPMAnimCallback extends DelayCallback {
   }
 }
 
+
 public class ITPMOffCallback extends DelayCallback {
   public let player: wref<PlayerPuppet>;
 
@@ -790,6 +835,13 @@ public func ITPMSetThirdPerson(enable: Bool) -> Void {
     // vehicle-style activation: the game's own event (sets up the head/body properly)
     let act: ref<ActivateTPPRepresentationEvent> = new ActivateTPPRepresentationEvent();
     this.QueueEvent(act);
+    // the original equips its own head item right away, in the same instant: do the same so the head is not waiting for the game
+    if !this.ITPMEquipTppHead(true, false) {
+      let hr: ref<ITPMHeadRetryCallback> = new ITPMHeadRetryCallback();
+      hr.player = this;
+      hr.attempt = 1;
+      GameInstance.GetDelaySystem(this.GetGame()).DelayCallback(hr, 0.1, true);
+    }
     let cb: ref<ITPMStartCallback> = new ITPMStartCallback();
     cb.player = this;
     GameInstance.GetDelaySystem(this.GetGame()).DelayCallback(cb, this.ITPMSet().startDelay, true);
