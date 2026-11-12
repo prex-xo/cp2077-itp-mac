@@ -69,12 +69,27 @@ public class ITPMSettings {
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera")
+  @runtimeProperty("ModSettings.displayName", "Smooth switching")
+  @runtimeProperty("ModSettings.description", "The camera glides between first and third person. Off switches almost instantly.")
+  public let smoothSwitch: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera")
   @runtimeProperty("ModSettings.displayName", "Camera start delay")
   @runtimeProperty("ModSettings.description", "Seconds the camera waits after you press the toggle key, so V's head can appear first. Lower = faster camera, higher = head ready sooner than the camera moves.")
   @runtimeProperty("ModSettings.step", "0.05")
   @runtimeProperty("ModSettings.min", "0.0")
   @runtimeProperty("ModSettings.max", "0.8")
   public let startDelay: Float = 0.10;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera")
+  @runtimeProperty("ModSettings.displayName", "Camera distance in elevators")
+  @runtimeProperty("ModSettings.description", "Maximum camera distance inside an elevator (when third person in elevators is on), so the camera stays inside the cabin.")
+  @runtimeProperty("ModSettings.step", "0.1")
+  @runtimeProperty("ModSettings.min", "0.5")
+  @runtimeProperty("ModSettings.max", "3.0")
+  public let elevatorDistance: Float = 1.2;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera")
@@ -128,9 +143,48 @@ public class ITPMSettings {
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Controls")
-  @runtimeProperty("ModSettings.displayName", "Third person while only in combat alert")
-  @runtimeProperty("ModSettings.description", "Off (default, like the original): first person whenever you are in combat. On: stay in third person in combat as long as nothing is in your hand (a drawn weapon, takedowns and left-hand cyberware still switch).")
-  public let alertTpp: Bool = false;
+  @runtimeProperty("ModSettings.displayName", "Third person in conversations and sit-downs")
+  @runtimeProperty("ModSettings.description", "Off (default, like the original): first person whenever the game runs a scene, including sitting down and conversations. On: stay in third person while sitting, lying down and talking; real cinematics are still first person. Experimental.")
+  public let sceneTpp: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Controls")
+  @runtimeProperty("ModSettings.displayName", "Third person at terminals and devices")
+  @runtimeProperty("ModSettings.description", "Off (default, like the original): first person at terminals, computers, vending machines and controlled devices, because screens are hard to use from behind V. On: stay in third person there.")
+  public let terminalTpp: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Controls")
+  @runtimeProperty("ModSettings.displayName", "Keep third person in cinematic cutscenes too")
+  @runtimeProperty("ModSettings.description", "Only with \"Third person in conversations and sit-downs\" on: also keep third person through real cinematics. Scene framing is made for first person and can look wrong.")
+  public let sceneEverything: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Controls")
+  @runtimeProperty("ModSettings.displayName", "Invert camera horizontal")
+  @runtimeProperty("ModSettings.description", "Reverses the sideways camera movement in free look and while sitting.")
+  public let invertX: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Controls")
+  @runtimeProperty("ModSettings.displayName", "Profiles the keys cycle through")
+  @runtimeProperty("ModSettings.description", "How many camera profiles the next and previous keys cycle through, counted from profile 1.")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.min", "2")
+  @runtimeProperty("ModSettings.max", "5")
+  public let hotkeyCount: Int32 = 5;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Controls")
+  @runtimeProperty("ModSettings.displayName", "Remember perspective")
+  @runtimeProperty("ModSettings.description", "When you load a save, go back to third person if you left it on (remembered per save).")
+  public let rememberPerspective: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Controls")
+  @runtimeProperty("ModSettings.displayName", "Shoulder camera with a weapon (experimental)")
+  @runtimeProperty("ModSettings.description", "Off (default): first person when a weapon is drawn. On: stay in third person with a close over-the-shoulder camera whose aim follows the game's own aim. The aim animations were made for first person, so arms and spine may look odd.")
+  public let weaponShoulder: Bool = false;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Controls")
@@ -192,6 +246,24 @@ public class ITPMSettings {
   public let p1fov: Float = 60.0;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 1")
+  @runtimeProperty("ModSettings.displayName", "Shoulder angle")
+  @runtimeProperty("ModSettings.description", "Swings the camera around V toward one shoulder (degrees). Camera profile 1.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-60.0")
+  @runtimeProperty("ModSettings.max", "60.0")
+  public let p1shoulder: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 1")
+  @runtimeProperty("ModSettings.displayName", "Head angle")
+  @runtimeProperty("ModSettings.description", "Tilts the camera up or down (degrees). Camera profile 1.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-30.0")
+  @runtimeProperty("ModSettings.max", "30.0")
+  public let p1head: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera profile 2")
   @runtimeProperty("ModSettings.category.order", "102")
   @runtimeProperty("ModSettings.displayName", "Side offset")
@@ -227,6 +299,24 @@ public class ITPMSettings {
   @runtimeProperty("ModSettings.min", "30.0")
   @runtimeProperty("ModSettings.max", "110.0")
   public let p2fov: Float = 60.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 2")
+  @runtimeProperty("ModSettings.displayName", "Shoulder angle")
+  @runtimeProperty("ModSettings.description", "Swings the camera around V toward one shoulder (degrees). Camera profile 2.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-60.0")
+  @runtimeProperty("ModSettings.max", "60.0")
+  public let p2shoulder: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 2")
+  @runtimeProperty("ModSettings.displayName", "Head angle")
+  @runtimeProperty("ModSettings.description", "Tilts the camera up or down (degrees). Camera profile 2.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-30.0")
+  @runtimeProperty("ModSettings.max", "30.0")
+  public let p2head: Float = 0.0;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera profile 3")
@@ -266,6 +356,24 @@ public class ITPMSettings {
   public let p3fov: Float = 60.0;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 3")
+  @runtimeProperty("ModSettings.displayName", "Shoulder angle")
+  @runtimeProperty("ModSettings.description", "Swings the camera around V toward one shoulder (degrees). Camera profile 3.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-60.0")
+  @runtimeProperty("ModSettings.max", "60.0")
+  public let p3shoulder: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 3")
+  @runtimeProperty("ModSettings.displayName", "Head angle")
+  @runtimeProperty("ModSettings.description", "Tilts the camera up or down (degrees). Camera profile 3.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-30.0")
+  @runtimeProperty("ModSettings.max", "30.0")
+  public let p3head: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera profile 4")
   @runtimeProperty("ModSettings.category.order", "104")
   @runtimeProperty("ModSettings.displayName", "Side offset")
@@ -303,6 +411,24 @@ public class ITPMSettings {
   public let p4fov: Float = 60.0;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 4")
+  @runtimeProperty("ModSettings.displayName", "Shoulder angle")
+  @runtimeProperty("ModSettings.description", "Swings the camera around V toward one shoulder (degrees). Camera profile 4.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-60.0")
+  @runtimeProperty("ModSettings.max", "60.0")
+  public let p4shoulder: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 4")
+  @runtimeProperty("ModSettings.displayName", "Head angle")
+  @runtimeProperty("ModSettings.description", "Tilts the camera up or down (degrees). Camera profile 4.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-30.0")
+  @runtimeProperty("ModSettings.max", "30.0")
+  public let p4head: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera profile 5")
   @runtimeProperty("ModSettings.category.order", "105")
   @runtimeProperty("ModSettings.displayName", "Side offset")
@@ -338,6 +464,62 @@ public class ITPMSettings {
   @runtimeProperty("ModSettings.min", "30.0")
   @runtimeProperty("ModSettings.max", "110.0")
   public let p5fov: Float = 60.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 5")
+  @runtimeProperty("ModSettings.displayName", "Shoulder angle")
+  @runtimeProperty("ModSettings.description", "Swings the camera around V toward one shoulder (degrees). Camera profile 5.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-60.0")
+  @runtimeProperty("ModSettings.max", "60.0")
+  public let p5shoulder: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera profile 5")
+  @runtimeProperty("ModSettings.displayName", "Head angle")
+  @runtimeProperty("ModSettings.description", "Tilts the camera up or down (degrees). Camera profile 5.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "-30.0")
+  @runtimeProperty("ModSettings.max", "30.0")
+  public let p5head: Float = 0.0;
+
+  // ---- Weapon camera (used with "Shoulder camera with a weapon") ----
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Weapon camera")
+  @runtimeProperty("ModSettings.category.order", "12")
+  @runtimeProperty("ModSettings.displayName", "Side offset")
+  @runtimeProperty("ModSettings.description", "How far the camera sits to the right of V while a weapon is drawn (negative = left shoulder).")
+  @runtimeProperty("ModSettings.step", "0.05")
+  @runtimeProperty("ModSettings.min", "-1.5")
+  @runtimeProperty("ModSettings.max", "1.5")
+  public let wSide: Float = 0.45;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Weapon camera")
+  @runtimeProperty("ModSettings.displayName", "Distance")
+  @runtimeProperty("ModSettings.description", "How far behind V the camera sits while a weapon is drawn.")
+  @runtimeProperty("ModSettings.step", "0.1")
+  @runtimeProperty("ModSettings.min", "0.3")
+  @runtimeProperty("ModSettings.max", "4.0")
+  public let wDist: Float = 0.80;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Weapon camera")
+  @runtimeProperty("ModSettings.displayName", "Height")
+  @runtimeProperty("ModSettings.description", "Camera height above V's feet while a weapon is drawn.")
+  @runtimeProperty("ModSettings.step", "0.05")
+  @runtimeProperty("ModSettings.min", "0.8")
+  @runtimeProperty("ModSettings.max", "2.5")
+  public let wHeight: Float = 1.60;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Weapon camera")
+  @runtimeProperty("ModSettings.displayName", "Field of view")
+  @runtimeProperty("ModSettings.description", "Field of view while a weapon is drawn. Lower zooms in.")
+  @runtimeProperty("ModSettings.step", "1.0")
+  @runtimeProperty("ModSettings.min", "30.0")
+  @runtimeProperty("ModSettings.max", "110.0")
+  public let wFov: Float = 42.0;
 
   // ---- Camera motion (bob, shake, dynamic distance) ----
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
@@ -389,36 +571,58 @@ public class ITPMSettings {
   @runtimeProperty("ModSettings.description", "Small messages when third person, free look or a camera profile changes.")
   public let showMessages: Bool = false;
 
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Misc")
+  @runtimeProperty("ModSettings.displayName", "Camera profile messages")
+  @runtimeProperty("ModSettings.description", "A small message naming the camera profile when you switch it (needs on-screen messages).")
+  public let profileMessages: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Misc")
+  @runtimeProperty("ModSettings.displayName", "Camera-blocked messages")
+  @runtimeProperty("ModSettings.description", "When you press the toggle key and third person does not start, a message says why.")
+  public let blockMessages: Bool = true;
+
   // value k (0 side, 1 distance, 2 height, 3 field of view) of camera profile idx (0..4)
   public func Val(idx: Int32, k: Int32) -> Float {
     if idx == 0 {
       if k == 0 { return this.p1side; }
       if k == 1 { return this.p1distance; }
       if k == 2 { return this.p1height; }
+      if k == 4 { return this.p1shoulder; }
+      if k == 5 { return this.p1head; }
       return this.p1fov;
     }
     if idx == 1 {
       if k == 0 { return this.p2side; }
       if k == 1 { return this.p2distance; }
       if k == 2 { return this.p2height; }
+      if k == 4 { return this.p2shoulder; }
+      if k == 5 { return this.p2head; }
       return this.p2fov;
     }
     if idx == 2 {
       if k == 0 { return this.p3side; }
       if k == 1 { return this.p3distance; }
       if k == 2 { return this.p3height; }
+      if k == 4 { return this.p3shoulder; }
+      if k == 5 { return this.p3head; }
       return this.p3fov;
     }
     if idx == 3 {
       if k == 0 { return this.p4side; }
       if k == 1 { return this.p4distance; }
       if k == 2 { return this.p4height; }
+      if k == 4 { return this.p4shoulder; }
+      if k == 5 { return this.p4head; }
       return this.p4fov;
     }
     if idx == 4 {
       if k == 0 { return this.p5side; }
       if k == 1 { return this.p5distance; }
       if k == 2 { return this.p5height; }
+      if k == 4 { return this.p5shoulder; }
+      if k == 5 { return this.p5head; }
       return this.p5fov;
     }
     return this.p1side;

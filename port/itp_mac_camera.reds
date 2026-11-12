@@ -69,6 +69,11 @@ public func ITPMNotify(text: String) -> Void {
   if !this.ITPMSet().showMessages {
     return;
   }
+  this.ITPMShow(text);
+}
+
+@addMethod(PlayerPuppet)
+public func ITPMShow(text: String) -> Void {
   let defs: ref<AllBlackboardDefinitions> = GetAllBlackboardDefs();
   let bb: ref<IBlackboard> = GameInstance.GetBlackboardSystem(this.GetGame()).Get(defs.UI_Notifications);
   let msg: SimpleScreenMessage;
@@ -561,6 +566,15 @@ public func ITPMFeaturesPark() -> Void {
   bridge.SetTppActive(false, false, false);
 }
 
+
+// true while the player aims down sights (the game's own aim state or zoom)
+@addMethod(PlayerPuppet)
+public func ITPMAiming() -> Bool {
+  let d: ref<AllBlackboardDefinitions> = GetAllBlackboardDefs();
+  let b: ref<IBlackboard> = GameInstance.GetBlackboardSystem(this.GetGame()).GetLocalInstanced(this.GetEntityID(), d.PlayerStateMachine);
+  return IsDefined(b) && (b.GetInt(d.PlayerStateMachine.UpperBody) == EnumInt(gamePSMUpperBodyStates.Aim) || b.GetFloat(d.PlayerStateMachine.ZoomLevel) > 1.05);
+}
+
 // Five camera presets (cycled with the profile keys). 0 = the default view.  k: 0 side, 1 distance, 2 height
 public func ITPMProfileVal(set: ref<ITPMSettings>, idx: Int32, k: Int32) -> Float {
   return set.Val(Clamp(idx, 0, 4), k);     // every profile has its own values in Mod Settings
@@ -575,21 +589,45 @@ public func ITPMUpdateTppCam() -> Void {
   this.m_itpPitchS += (this.m_itpPitch - this.m_itpPitchS) * this.ITPMSet().smooth;
   this.ITPMSyncProfile();
   this.ITPMFeaturesTick(false);
-  this.m_itpShoulderB += ((this.m_itpShoulder ? 1.0 : 0.0) - this.m_itpShoulderB) * 0.2;
+  let dS: ref<AllBlackboardDefinitions> = GetAllBlackboardDefs();
+  let pS: ref<IBlackboard> = GameInstance.GetBlackboardSystem(this.GetGame()).GetLocalInstanced(this.GetEntityID(), dS.PlayerStateMachine);
+  this.m_itpSitOrbit = IsDefined(pS) && (pS.GetInt(dS.PlayerStateMachine.IsInWorkspot) != 0 || pS.GetInt(dS.PlayerStateMachine.SceneTier) >= 3);
+  this.ITPMSitLock(this.m_itpSitOrbit && IsDefined(pS) && pS.GetInt(dS.PlayerStateMachine.IsInWorkspot) != 0 && pS.GetInt(dS.PlayerStateMachine.SceneTier) < 3);
+  let wShoulder: Bool = this.ITPMSet().weaponShoulder && this.ITPMWeaponDrawn() && this.ITPMAiming();                              // ... and the player aims: only then the weapon camera
+  this.m_itpShoulderB += (((this.m_itpShoulder || wShoulder) ? 1.0 : 0.0) - this.m_itpShoulderB) * 0.2;
+  // the up-and-down angle stays ours (mouse Y); the game's own first-person camera does not follow the mouse while third person is on
   this.ITPMMotionStep();
   let b: Float = this.m_itpShoulderB;
-  let th: Float = Deg2Rad(this.m_itpPitchS + this.m_itpMPitch);
+  let th: Float = Deg2Rad(this.m_itpPitchS + this.m_itpMPitch + ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 5));
   let sideP: Float = ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 0);
   let sgn: Float = sideP < 0.0 ? -1.0 : 1.0;
   // shoulder zoom blends the preset toward: side 0.45, distance 0.80, height 1.60, FOV 42 (original defaults)
-  let side: Float = sideP + (sgn * 0.45 - sideP) * b + this.m_itpMX;
-  let dist: Float = ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 1) + (0.80 - ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 1)) * b + this.m_itpMDist * (1.0 - b);
-  let high: Float = ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 2) + (1.60 - ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 2)) * b + this.m_itpMHeight + this.m_itpMZ;
+  // while a weapon is drawn (shoulder camera mode) the 'Weapon camera' page sets the pose; the shoulder-zoom key keeps its fixed values
+  let wcam: Bool = this.ITPMSet().weaponShoulder && this.ITPMWeaponDrawn() && this.ITPMAiming();
+  let shSide: Float = wcam ? this.ITPMSet().wSide : sgn * 0.45;
+  let shDist: Float = wcam ? this.ITPMSet().wDist : 0.80;
+  let shHigh: Float = wcam ? this.ITPMSet().wHeight : 1.60;
+  let shFov: Float = wcam ? this.ITPMSet().wFov : 42.0;
+  let side: Float = sideP + (shSide - sideP) * b + this.m_itpMX;
+  let dist: Float = ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 1) + (shDist - ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 1)) * b + this.m_itpMDist * (1.0 - b);
+  let inElev: Bool = false;
+  if !this.ITPMSet().elevatorTpp {
+    inElev = false;
+  } else {
+    let d0: ref<AllBlackboardDefinitions> = GetAllBlackboardDefs();
+    let pb0: ref<IBlackboard> = GameInstance.GetBlackboardSystem(this.GetGame()).GetLocalInstanced(this.GetEntityID(), d0.PlayerStateMachine);
+    inElev = IsDefined(pb0) && pb0.GetBool(d0.PlayerStateMachine.IsPlayerInsideElevator);
+  }
+  let high: Float = ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 2) + (shHigh - ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 2)) * b + this.m_itpMHeight + this.m_itpMZ;
+  if inElev {
+    dist = MinF(dist, this.ITPMSet().elevatorDistance);        // stay inside the cabin
+    side = ClampF(side, -0.35, 0.35);
+  }
   let z: Float = MaxF(high - dist * SinF(th), ITPMCfgMinHeight());
   let s: Float = SinF(th * 0.5);
   let c: Float = CosF(th * 0.5);
   // free look returns smoothly to behind V when released
-  if !this.m_itpFree && !this.m_itpFront && this.m_itpYaw != 0.0 {
+  if !this.m_itpFree && !this.m_itpFront && !this.m_itpSitOrbit && this.m_itpYaw != 0.0 {
     let step: Float = 8.0;
     if AbsF(this.m_itpYaw) <= step {
       this.m_itpYaw = 0.0;
@@ -598,7 +636,7 @@ public func ITPMUpdateTppCam() -> Void {
     }
   }
   // camera yaw around V: free look yaw, plus 180 degrees for front view
-  let yaw: Float = this.m_itpYaw + (this.m_itpFront ? 180.0 : 0.0) + this.m_itpMYaw;
+  let yaw: Float = this.m_itpYaw + (this.m_itpFront ? 180.0 : 0.0) + this.m_itpMYaw + ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 4);
   let ph: Float = Deg2Rad(yaw);
   let ox: Float = side;
   let oy: Float = -dist * CosF(th) + this.m_itpMY;
@@ -625,7 +663,7 @@ public func ITPMUpdateTppCam() -> Void {
     let full: Float = SqrtF(dx * dx + dy * dy + dz * dz);
     let target: Float = 1.0;
     if full > 0.05 {
-      let groups: array<CName> = [n"Static", n"Visibility"];
+      let groups: array<CName> = [n"Static", n"Visibility", n"PlayerBlocker", n"Dynamic"];
       let gi: Int32 = 0;
       while gi < ArraySize(groups) {
         let res: TraceResult;
@@ -651,7 +689,7 @@ public func ITPMUpdateTppCam() -> Void {
     // our own glide from the first-person camera spot to the final spot: starts exactly where the first-person camera is,
     // pulls straight back, the shoulder offset eases in on the way (no sideways slide, no weird angle)
     let gt: Float = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGame())) - this.m_itpGlideT0;
-    let g: Float = ClampF(gt / MaxF(this.ITPMSet().blendTime, 0.1), 0.0, 1.0);
+    let g: Float = ClampF(gt / (this.ITPMSet().smoothSwitch ? MaxF(this.ITPMSet().blendTime, 0.1) : 0.05), 0.0, 1.0);
     let e: Float = g * g * (3.0 - 2.0 * g);
     lx = this.m_itpGSX + (lx - this.m_itpGSX) * e;
     ly = this.m_itpGSY + (ly - this.m_itpGSY) * e;
@@ -688,7 +726,7 @@ public func ITPMUpdateTppCam() -> Void {
     }
   }
   let baseFov: Float = ITPMProfileVal(this.ITPMSet(), this.m_itpProfile, 3);
-  let fov: Float = baseFov + (MinF(baseFov, 42.0) - baseFov) * b;
+  let fov: Float = baseFov + ((wcam ? shFov : MinF(baseFov, shFov)) - baseFov) * b;
   if this.m_itpFovCur <= 1.0 {
     this.m_itpFovCur = fov;
   }
@@ -753,6 +791,7 @@ public func ITPMStopTppCam() -> Void {
     return;
   }
   this.ITPMFeaturesPark();
+  this.ITPMSitLock(false);
   if this.m_itpFree {
     this.ITPMFreeLook(false);
   }
@@ -819,7 +858,7 @@ public func ITPMGlideOutStep() -> Void {
     return;
   }
   let now: Float = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGame()));
-  let g: Float = ClampF((now - this.m_itpGOT0) / 0.35, 0.0, 1.0);
+  let g: Float = ClampF((now - this.m_itpGOT0) / (this.ITPMSet().smoothSwitch ? 0.35 : 0.05), 0.0, 1.0);
   let e: Float = g * g * (3.0 - 2.0 * g);
   let fp: Vector4 = this.ITPMFppPose();
   cam.SetLocalPosition(new Vector4(this.m_itpGOX + (fp.X - this.m_itpGOX) * e, this.m_itpGOY + (fp.Y - this.m_itpGOY) * e, this.m_itpGOZ + (fp.Z - this.m_itpGOZ) * e, 1.0));
@@ -854,6 +893,7 @@ public func ITPMBeginExitGlide() -> Bool {
     return false;
   }
   this.ITPMFeaturesPark();
+  this.ITPMSitLock(false);
   if this.m_itpFree {
     this.ITPMFreeLook(false);
   }
@@ -979,6 +1019,26 @@ public class ITPMAnimCallback extends DelayCallback {
 }
 
 
+// "Remember perspective": after loading a save, go back to third person if it was on when the save was made.
+public class ITPMRestoreCallback extends DelayCallback {
+  public let player: wref<PlayerPuppet>;
+
+  public func Call() -> Void {
+    let p: ref<PlayerPuppet> = this.player;
+    if !IsDefined(p) || !p.ITPMSet().rememberPerspective || p.m_itpWanted {
+      return;
+    }
+    if GameInstance.GetQuestsSystem(p.GetGame()).GetFact(n"itp_tpp_wanted") > 0 {
+      p.m_itpWanted = true;
+      p.m_itpHold = 0;
+      let pcb: ref<ITPMPollCallback> = new ITPMPollCallback();
+      pcb.player = p;
+      GameInstance.GetDelaySystem(p.GetGame()).DelayCallback(pcb, 0.25, true);
+      p.ITPMSync();
+    }
+  }
+}
+
 public class ITPMOffCallback extends DelayCallback {
   public let player: wref<PlayerPuppet>;
 
@@ -1078,6 +1138,7 @@ public func ITPMWeaponDrawn() -> Bool {
   return IsDefined(ts.GetItemInSlot(this, t"AttachmentSlots.WeaponRight"));
 }
 
+@addField(PlayerPuppet) public let m_itpWhy: String;       // why third person is blocked right now (for the message)
 @addField(PlayerPuppet) public let m_itpHold: Int32;   // polls (0.1 s each) left before third person may come back
 
 // false while the player controls a different body (behavioral imprint, Johnny flashbacks, ...): our camera belongs to V's body only.
@@ -1092,46 +1153,70 @@ public func ITPMControlsOwnBody() -> Bool {
 @addMethod(PlayerPuppet)
 public func ITPMBlockHold() -> Int32 {
   let hold: Int32 = 0;
+  let why: String = "";
   if !this.ITPMControlsOwnBody() {
     hold = 10;                                   // another body is controlled -> first person only
+    why += "another body; ";
   }
   if this.m_itpQuick {
     hold = 3;                                    // quick first person key held
+    why += "quick first person key; ";
   }
-  if this.ITPMWeaponDrawn() {
+  if this.ITPMWeaponDrawn() && !this.ITPMSet().weaponShoulder {
     hold = 3;                                    // weapon holstered -> back after 0.3 s
+    why += "weapon in hand; ";
   }
   if VehicleComponent.IsMountedToVehicle(this.GetGame(), this) {
     hold = Max(hold, 4);                        // left a vehicle -> back after 0.4 s
+    why += "vehicle; ";
   }
   let d: ref<AllBlackboardDefinitions> = GetAllBlackboardDefs();
   let psm: ref<IBlackboard> = GameInstance.GetBlackboardSystem(this.GetGame()).GetLocalInstanced(this.GetEntityID(), d.PlayerStateMachine);
-  if IsDefined(psm) && psm.GetInt(d.PlayerStateMachine.SceneTier) > 1 {
+  let sceneLimit: Int32 = !this.ITPMSet().sceneTpp ? 3 : (this.ITPMSet().sceneEverything ? 99 : 5);      // original: tier >= 3 is a scene; 'conversations and sit-downs' keeps tiers 3-4
+  if IsDefined(psm) && psm.GetInt(d.PlayerStateMachine.SceneTier) >= sceneLimit {
     hold = Max(hold, 15);                       // cutscene / dialogue / staged scene -> back after 1.5 s
+    why += "scene (tier " + ToString(psm.GetInt(d.PlayerStateMachine.SceneTier)) + "); ";
   }
   if IsDefined(psm) {
     // the original's "combat" group: in combat, takedowns, carrying a body, left-hand gadget or cyberware (1.25 s after it ends)
-    let inCombat: Bool = psm.GetInt(d.PlayerStateMachine.Combat) == EnumInt(gamePSMCombat.InCombat);
     let handBusy: Bool = psm.GetInt(d.PlayerStateMachine.Takedown) != 0 || psm.GetInt(d.PlayerStateMachine.BodyCarrying) != 0
       || psm.GetInt(d.PlayerStateMachine.CombatGadget) != 0 || psm.GetInt(d.PlayerStateMachine.LeftHandCyberware) != 0;
-    if handBusy || (inCombat && !this.ITPMSet().alertTpp) {
+    // combat alone no longer keeps first person: after holstering a weapon you are back in third person, in combat or not
+    if handBusy {
       hold = Max(hold, 13);
+      why += "takedown/carry/gadget/cyberware; ";
     }
     // special actions: sitting/working at a workspot, forcing a door, personal-link hacks, terminals and controlled devices
-    if psm.GetInt(d.PlayerStateMachine.IsInWorkspot) != 0 || psm.GetBool(d.PlayerStateMachine.IsForceOpeningDoor) || psm.GetBool(d.PlayerStateMachine.IsInteractingViaPersonalLink)
-      || psm.GetBool(d.PlayerStateMachine.IsUIZoomDevice) || psm.GetBool(d.PlayerStateMachine.IsControllingDevice) {
+    if psm.GetInt(d.PlayerStateMachine.IsInWorkspot) != 0 && !this.ITPMSet().sceneTpp {
       hold = Max(hold, 5);
+      why += "sitting/workspot (the setting 'Third person in conversations and sit-downs' is off); ";
+    }
+    if psm.GetBool(d.PlayerStateMachine.IsForceOpeningDoor) || psm.GetBool(d.PlayerStateMachine.IsInteractingViaPersonalLink) {
+      hold = Max(hold, 5);
+      why += "door/personal link; ";
+    }
+    if psm.GetBool(d.PlayerStateMachine.IsUIZoomDevice) && !this.ITPMSet().terminalTpp {
+      hold = Max(hold, 5);
+      why += "terminal/device zoom; ";
+    }
+    if psm.GetBool(d.PlayerStateMachine.IsControllingDevice) && !this.ITPMSet().terminalTpp {
+      hold = Max(hold, 5);
+      why += "controlling a device (TV, camera...); ";
     }
   }
   if !this.ITPMSet().elevatorTpp && IsDefined(psm) && psm.GetBool(d.PlayerStateMachine.IsPlayerInsideElevator) {
     hold = Max(hold, 5);                         // inside an elevator -> first person (the cabin walls can be see-through to the camera)
+    why += "elevator; ";
   }
   if this.ITPMSet().scannerFpp && IsDefined(psm) && psm.GetInt(d.PlayerStateMachine.Vision) == EnumInt(gamePSMVision.Focus) {
     hold = Max(hold, 3);                         // scanner / quickhack view (Tab): back after 0.3 s
+    why += "scanner/quickhack view; ";
   }
   if GameInstance.GetBlackboardSystem(this.GetGame()).Get(d.Braindance).GetBool(d.Braindance.IsActive) {
     hold = Max(hold, 10);
+    why += "braindance; ";
   }
+  this.m_itpWhy = why;
   return hold;
 }
 
@@ -1202,6 +1287,7 @@ public func ITPMMoveRelativeToCamera(on: Bool) -> Void {
   }
 }
 
+@addField(PlayerPuppet) public let m_itpSitOrbit: Bool;    // sitting or in a scene: the mouse orbits the camera (the body is locked by the game)
 @addField(PlayerPuppet) public let m_itpFreeTick: Int32;
 @addField(PlayerPuppet) public let m_itpKeySeen: Int32;
 @addField(PlayerPuppet) public let m_itpFlSaved: Bool;     // the first-person camera's original values are saved (free look is on)
@@ -1227,6 +1313,46 @@ public func ITPMBodyYaw() -> Float {
 
 @addField(PlayerPuppet) public let m_itpFree: Bool;
 @addField(PlayerPuppet) public let m_itpYaw: Float;       // camera yaw around V in degrees (free look / front view)
+
+
+// Sitting by yourself (not a scripted scene): the game lets you look around with its own camera. Switch that off while third person
+// is on, so the mouse only orbits OUR camera, exactly like in a mission scene where the game already holds its camera still.
+@addField(PlayerPuppet) public let m_itpSlSaved: Bool;
+@addField(PlayerPuppet) public let m_itpSlYL: Float;
+@addField(PlayerPuppet) public let m_itpSlYR: Float;
+@addField(PlayerPuppet) public let m_itpSlPMax: Float;
+@addField(PlayerPuppet) public let m_itpSlPMin: Float;
+
+@addMethod(PlayerPuppet)
+public func ITPMSitLock(on: Bool) -> Void {
+  let fpp: ref<FPPCameraComponent> = this.FindComponentByName(n"camera") as FPPCameraComponent;
+  if !IsDefined(fpp) {
+    return;
+  }
+  if on {
+    if !this.m_itpSlSaved && !this.m_itpFlSaved {
+      this.m_itpSlYL = fpp.yawMaxLeft;
+      this.m_itpSlYR = fpp.yawMaxRight;
+      this.m_itpSlPMax = fpp.pitchMax;
+      this.m_itpSlPMin = fpp.pitchMin;
+      this.m_itpSlSaved = true;
+    }
+    if this.m_itpSlSaved {
+      fpp.yawMaxLeft = 0.0;
+      fpp.yawMaxRight = 0.0;
+      fpp.pitchMax = 0.0;
+      fpp.pitchMin = 0.0;
+    }
+  } else {
+    if this.m_itpSlSaved {
+      fpp.yawMaxLeft = this.m_itpSlYL;
+      fpp.yawMaxRight = this.m_itpSlYR;
+      fpp.pitchMax = this.m_itpSlPMax;
+      fpp.pitchMin = this.m_itpSlPMin;
+      this.m_itpSlSaved = false;
+    }
+  }
+}
 
 // Free look: the original sets headingLocked + wide yaw/pitch limits on the cameras, so the mouse turns the camera
 // instead of V's body. On release it resets the camera to straight behind V.
@@ -1344,9 +1470,15 @@ public func ITPMDoAction(name: CName, down: Bool, up: Bool) -> Bool {
   }
   if Equals(name, n"ITP_ProfileNext") || Equals(name, n"ITP_ProfilePrev") {
     if down {
-      let step: Int32 = Equals(name, n"ITP_ProfileNext") ? 1 : 4;
-      this.m_itpProfile = (this.m_itpProfile + step) % 5;
-      this.ITPMNotify("Camera profile " + ToString(this.m_itpProfile + 1) + " of 5 (active)");
+      let n: Int32 = Clamp(this.ITPMSet().hotkeyCount, 2, 5);
+      if this.m_itpProfile >= n {
+        this.m_itpProfile = Equals(name, n"ITP_ProfileNext") ? 0 : n - 1;
+      } else {
+        this.m_itpProfile = (this.m_itpProfile + (Equals(name, n"ITP_ProfileNext") ? 1 : n - 1)) % n;
+      }
+      if this.ITPMSet().profileMessages {
+        this.ITPMNotify("Camera profile " + ToString(this.m_itpProfile + 1) + " of 5 (active)");
+      }
     }
     return true;
   }
@@ -1362,6 +1494,7 @@ protected cb func OnAction(action: ListenerAction, consumer: ListenerActionConsu
   }
   if Equals(name, n"ToggleWalk") && ListenerAction.IsButtonJustPressed(action) {
     this.m_itpWanted = !this.m_itpWanted;
+    GameInstance.GetQuestsSystem(this.GetGame()).SetFact(n"itp_tpp_wanted", this.m_itpWanted ? 1 : 0);   // remembered per save
     if this.m_itpWanted {
       this.m_itpHold = 0;
       let pcb: ref<ITPMPollCallback> = new ITPMPollCallback();
@@ -1376,6 +1509,10 @@ protected cb func OnAction(action: ListenerAction, consumer: ListenerActionConsu
       }
     }
     this.ITPMSync();
+    if this.m_itpWanted && !this.m_itpTppOn && this.m_itpHold > 0 && this.ITPMSet().blockMessages {
+      // tell the player why third person does not start (shown even when on-screen messages are off)
+      this.ITPMShow("Third person is waiting because of: " + this.m_itpWhy);
+    }
   } else {
     if this.m_itpTppOn {
       let nm: String = NameToString(name);
@@ -1383,11 +1520,12 @@ protected cb func OnAction(action: ListenerAction, consumer: ListenerActionConsu
         this.m_itpNames += nm + ",";
       }
       let sign: Float = this.ITPMSet().invertPitch ? -1.0 : 1.0;
-      if this.m_itpFree && (Equals(name, n"CameraMouseX") || Equals(name, n"mouse_x")) {
-        this.m_itpYaw = this.ITPMWrapDeg(this.m_itpYaw - ClampF(ListenerAction.GetValue(action) * this.ITPMSet().freeLookSens, -6.0, 6.0));
+      let xs: Float = this.ITPMSet().invertX ? -1.0 : 1.0;
+      if (this.m_itpFree || this.m_itpSitOrbit) && (Equals(name, n"CameraMouseX") || Equals(name, n"mouse_x")) {
+        this.m_itpYaw = this.ITPMWrapDeg(this.m_itpYaw - xs * ClampF(ListenerAction.GetValue(action) * this.ITPMSet().freeLookSens, -6.0, 6.0));
       }
-      if this.m_itpFree && Equals(name, n"CameraX") {
-        this.m_itpYaw = this.ITPMWrapDeg(this.m_itpYaw - ListenerAction.GetValue(action) * ITPMCfgPitchPerUnitStick());
+      if (this.m_itpFree || this.m_itpSitOrbit) && Equals(name, n"CameraX") {
+        this.m_itpYaw = this.ITPMWrapDeg(this.m_itpYaw - xs * ListenerAction.GetValue(action) * ITPMCfgPitchPerUnitStick());
       }
       if Equals(name, n"CameraMouseY") || Equals(name, n"mouse_y") {
         this.m_itpRaw = ListenerAction.GetValue(action);
@@ -1445,6 +1583,9 @@ public func ITPMBridgeSwitch(p: ref<PlayerPuppet>, tpp: Bool) -> Void {
 // The mod shows a Windows-flavoured welcome popup once per save; mark it as already seen.
 @wrapMethod(PlayerPuppet)
 protected cb func OnGameAttached() -> Bool {
+  let rcb: ref<ITPMRestoreCallback> = new ITPMRestoreCallback();
+  rcb.player = this;
+  GameInstance.GetDelaySystem(this.GetGame()).DelayCallback(rcb, 5.0, true);
   // mouse axes for the third-person camera: registered once, never unregistered (the game's own code may rely on them)
   this.RegisterInputListener(this, n"CameraMouseY");
   this.RegisterInputListener(this, n"CameraY");

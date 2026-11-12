@@ -24,7 +24,9 @@ It is **not affiliated with or endorsed by CybrDrake**.
 Press **G** to switch between first and third person. Everything below works:
 
 - **Smooth switching** into and out of third person.
-- **Automatic first person** when it makes sense: weapon drawn, combat, vehicles, cutscenes and dialogue, scanner / quickhacks (Tab), elevators, terminals, sitting down, and when you control someone else (like the behavioral imprint).
+- **Automatic first person** when it makes sense: weapon drawn, vehicles, scanner / quickhacks (Tab), braindance, and when you control someone else (like the behavioral imprint). Putting your weapon away brings third person back, in combat or not.
+- **Sitting, elevators, terminals and many cutscenes can stay in third person** (each is an option you can turn off). While sitting you can look around with the mouse.
+- An optional **weapon camera**: a closer over-the-shoulder view only while you aim (off by default, with its own position settings).
 - **5 camera profiles** you can edit, **shoulder zoom**, **front view**, **quick first-person peek**, and **free look**.
 - The camera **pulls in at walls** instead of going through them.
 - **Camera motion**: bob when walking, shake when running, drop when crouching or sliding, lean when sliding, bump when landing hard.
@@ -102,15 +104,16 @@ Quit the game first. Your settings are kept. After a game or NightCity Console u
 **Change the keys:** in the game, go to **Settings → Mod Settings → Immersive Third Person → Key bindings**, turn on *Use these key bindings*, and pick a key for each action.
 Choose keys the game does not use (M = map, J = journal and I = inventory would do both things).
 
-**Other settings** are on the same page: camera profiles (side, distance, height, FOV), transition time, how close the camera may come to a wall,
-look speed, first person in combat / scanner / elevators, camera motion, auto vault (off by default), and on-screen messages.
+**Other settings** are on the same page: five camera profiles (side, distance, height, FOV, shoulder and head angles), smooth switching and transition time, how close the camera may come to a wall,
+look speed, invert options, how many hotkeys to use, remembering your last view, third person while sitting / in cutscenes / at terminals / in elevators, the weapon camera, camera motion, auto vault (off by default), and on-screen messages.
+Known limit: with a gun in hand V's arms look stiff, because the original mod has no third-person gun animations.
 
 ## The animation swap: please read
 
 On Windows, a DLL swaps the mod's animations in while you play. That is not possible on a Mac, so the installer does it **once, before the game starts**:
 it builds two extra files from your copy of the mod and puts them next to the game's files:
 
-- `itp_mac_tpp_animsets.archive` (about 410 MB): the mod's animations for V.
+- `itp_mac_tpp_animsets.archive` (about 80 MB): the mod's third-person versions of V's everyday animations (walking, idles, world actions). It leaves out the main movement sets, the gun/aim sets and the quest-scene sets on purpose, because those made first-person aiming shift or cutscenes look stiff.
 - `itp_mac_consumables.archive` (6 MB, female V only): the healing animation.
 
 No game file is edited. The swap also applies in first person (it cannot change while you play). In testing, first person looked normal, but if **anything looks wrong with V's animations, switch it off**:
