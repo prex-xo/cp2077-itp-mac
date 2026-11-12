@@ -11,7 +11,7 @@ It is **not affiliated with or endorsed by CybrDrake**.
 
 - Original mod (Nexus): https://www.nexusmods.com/cyberpunk2077/mods/32203 (ported from version **2.0.1**)
 - **This repo contains none of the original mod's files.** You download them yourself from Nexus, and the installer builds the Mac version from your copy.
-- Please endorse the original mod on Nexus if you like it. It is a fan port for personal, single-player use.
+- Please endorse the original mod on Nexus if you like it.
 
 ## Demo video
 
@@ -143,5 +143,4 @@ to clone this repo or run a script. Nothing is submitted yet, and it is up to Ni
 ## Notes
 
 - Do not mix this with other mods that replace the player's entity or animation graph.
-- For single-player, personal use, on your own legally owned copy of the game.
 - If anyone knows how the original DLL swaps animations while playing, you are very welcome to get in touch.
