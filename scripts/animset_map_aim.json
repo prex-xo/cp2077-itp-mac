@@ -1,0 +1,280 @@
+{
+"_about": "Gun/aim animation sets (same format as animset_map.json).",
+"replace": [
+{
+"target": "0c0db12a1611304d",
+"source": "d92a0face2685fcb",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "17bb5d83288de3fa",
+"source": "1e5fe9e9404ed7df",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "1801519a64e008a4",
+"source": "f1d4083a6b4f82a8",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "267d2e22784ae6d0",
+"source": "2d8098137cee5649",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "272fa768f5005ebc",
+"source": "2628c02e68dfc4bb",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "2b9f15bcb81347d8",
+"source": "84514ef4a1ba5c19",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "33ab406c52d06b8a",
+"source": "2ea6d06dee4ddac8",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "3a50422a5ad28bd1",
+"source": "3a6ef4db48fcd18a",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "42e3612cb39a60b4",
+"source": "8f7f79e04b38773d",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "43a88edd7f80aff8",
+"source": "73d28dcf2b6aca0a",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "45190f128e928868",
+"source": "bb12d9be72bb1485",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "4939a4a606b7ccfd",
+"source": "cd9f77eeb82b6b18",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "542578cc3b2915f9",
+"source": "8b167fd488125d9a",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "57112972dd629853",
+"source": "68e47e0ffdd93ef0",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "5b8687eaf2774976",
+"source": "a4a00588b3a5c65c",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "5c38110ff95b1019",
+"source": "3b8f023d5bfc8a87",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "5f4eaaabc498b513",
+"source": "40b69b7658608375",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "6213437c826764a3",
+"source": "cc59352ba92efcc8",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "624ecfcb3030ed1e",
+"source": "84b38e5e9de190ff",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "69f9241fd5f5962d",
+"source": "99986794aa3c9dac",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "6d563c5f16b35d37",
+"source": "99f879fef10c2083",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "72022350ed7de942",
+"source": "57299bffc61f3087",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "739bfd645aacd206",
+"source": "e2314041557135bb",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "790ce442ddf8f32c",
+"source": "321918cc7fd8d12e",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "897f2e2b19f45aa3",
+"source": "d1ffd48ca108ec77",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "96c209b23e29a428",
+"source": "b39669b0e2f3ad97",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "99281034e6908dfa",
+"source": "0b25ac93cffe4a60",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "994d950350e1f7db",
+"source": "e24170e911f880f6",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "9b1e0a0312265608",
+"source": "5c19ddaccfadf4aa",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "9d4792275d4fd986",
+"source": "bffa97d5f4b85e27",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "9e94d4e3e0c75921",
+"source": "17a27c32245ab6ca",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "a1b82434350cb97d",
+"source": "4e39327603740984",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "aa1f4b933b9b630b",
+"source": "4a6ae8972d8447c7",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "ab0dcd4bd6c2cc5d",
+"source": "3d4ad0428f4ae128",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "ae3dc9d12a5b32d8",
+"source": "61d4ec19ddea6926",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "b67203bdbcd43f23",
+"source": "d368134182fd40ee",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "b8d80118bf06252a",
+"source": "d9a01112f98f2a93",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "bae09b3911d24aaf",
+"source": "765e0c8d9549222b",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "bebaeab7bb858276",
+"source": "dc88ef8abe9f5d91",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "c37d44c4935ee9a1",
+"source": "4d364e9105843b04",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "c4bec437a4b49e49",
+"source": "96aa52798378cfaa",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "c50aecbfa05b49d8",
+"source": "cb9d3b2d020d1b49",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "dc2ee8c182575cf8",
+"source": "f38dd0403a94565a",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "ddb2a167e102eece",
+"source": "75d7f3d6177ace56",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "de3ee3b2f12b6ab2",
+"source": "7862c1d2f333a1fb",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "de5f7d368e467e3b",
+"source": "b711eeaf38ce6f34",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "e1b520a0621705e2",
+"source": "7ca761e919e24fc9",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "e280e045e3fbcc01",
+"source": "dfc0bbd9e1d63fec",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "e87ecc23ab79c78f",
+"source": "8b59269d8a66e222",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "ee1a50867f5c1348",
+"source": "f817d3eeb79b92d5",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "f3d572fde8cd22f4",
+"source": "3bb6f166c7e8e5fd",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "f47507b70d1807a8",
+"source": "d53f934501ae43d4",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "f5eaca3636c770e6",
+"source": "4232aa14b3f042ab",
+"archive": "content/basegame_4_animation.archive"
+},
+{
+"target": "f8f65db05f614428",
+"source": "e32073c3fd67ea61",
+"archive": "ep1/ep1_2_gamedata.archive"
+},
+{
+"target": "fca102441da12654",
+"source": "6752368b07be25df",
+"archive": "content/basegame_4_animation.archive"
+}
+]
+}

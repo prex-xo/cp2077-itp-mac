@@ -537,6 +537,7 @@ public func ITPMFeaturesTick(force: Bool) -> Void {
   if !force && now - this.m_itpFeatT < 0.2 {
     return;                                         // the heartbeat goes stale after 0.5 s, so refresh every 0.2 s
   }
+  let dtF: Float = now - this.m_itpFeatT;
   this.m_itpFeatT = now;
   let bridge: ref<TPPCameraVisibleRenderBridge> = GameInstance.GetScriptableSystemsContainer(this.GetGame()).Get(n"TPPCameraVisibleRenderBridge") as TPPCameraVisibleRenderBridge;
   if !IsDefined(bridge) {
@@ -553,6 +554,116 @@ public func ITPMFeaturesTick(force: Bool) -> Void {
   bridge.SetDashSideConfig(0.50, 2.0833333);
   bridge.SetMaleLaneLive(true);
   bridge.SetAutoVault(this.ITPMSet().autoVault);
+  this.ITPMPickupTick(bridge, dtF, now);
+  this.ITPMHeadTick(now);
+}
+
+// ---- loot pickup hand animation (what the original's Lua did: the bridge notes a pickup, we raise a graph pulse for 2 s) ----
+@addField(PlayerPuppet) public let m_itpPickUntil: Float;
+@addField(PlayerPuppet) public let m_itpPickGround: Bool;
+
+@addMethod(PlayerPuppet)
+public func ITPMPickupTick(bridge: ref<TPPCameraVisibleRenderBridge>, dt: Float, now: Float) -> Void {
+  bridge.TickPickupClocks(dt);
+  if !this.ITPMSet().itemPickupAnim {
+    if this.m_itpPickUntil > 0.0 {
+      this.ITPMPickupDrop();
+    }
+    return;
+  }
+  if bridge.ConsumePendingPickup() && this.m_itpPickUntil <= 0.0 {
+    this.m_itpPickGround = bridge.GetLastPickupClass() == 2;
+    let sp: Float = ClampF(this.ITPMSet().pickupSpeed, 1.0, 4.0);
+    this.m_itpPickUntil = now + 2.0 / sp;
+    if sp > 1.01 {
+      // speed only V up for the length of the gesture (3.3 s at normal speed)
+      this.SetIndividualTimeDilation(n"ITPMPickup", sp, 3.5 / sp, n"Linear", n"Linear");
+      this.ITPMNotify("Pickup speed-up x" + FloatToString(sp) + (this.HasIndividualTimeDilation() ? ": active" : ": NOT active"));
+    }
+    AnimationControllerComponent.SetInputFloat(this, this.m_itpPickGround ? n"tpp_item_ground_req" : n"tpp_item_pickup_req", 1.0);
+    this.ITPMNotify("Pickup animation triggered" + (this.m_itpPickGround ? " (ground)" : ""));
+  }
+  if this.m_itpPickUntil > 0.0 && now >= this.m_itpPickUntil {
+    this.ITPMPickupDrop();
+  }
+}
+
+@addMethod(PlayerPuppet)
+public func ITPMPickupDrop() -> Void {
+  AnimationControllerComponent.SetInputFloat(this, n"tpp_item_pickup_req", 0.0);
+  AnimationControllerComponent.SetInputFloat(this, n"tpp_item_ground_req", 0.0);
+  this.m_itpPickUntil = 0.0;
+}
+
+// ---- head follows camera (the original's TPPCameraHeadLook system, driven the way its Lua did) ----
+@addField(PlayerPuppet) public let m_itpHLOn: Bool;
+@addField(PlayerPuppet) public let m_itpHLGate: Bool;
+@addField(PlayerPuppet) public let m_itpHLGateOff: Float;
+
+@addMethod(PlayerPuppet)
+public func ITPMHeadGate(on: Bool) -> Void {
+  let f: ref<gameAnimFeature_TPPRepresentation> = new gameAnimFeature_TPPRepresentation();
+  f.IsActive = on;
+  AnimationControllerComponent.ApplyFeature(this, n"TPPHeadLook", f);
+  this.m_itpHLGate = on;
+}
+
+@addMethod(PlayerPuppet)
+public func ITPMHeadTick(now: Float) -> Void {
+  let hl: ref<TPPCameraHeadLook> = GameInstance.GetScriptableSystemsContainer(this.GetGame()).Get(n"TPPCameraHeadLook") as TPPCameraHeadLook;
+  if !IsDefined(hl) {
+    return;
+  }
+  let wantFeature: Bool = this.ITPMSet().headLook;
+  hl.SetConversationLook(wantFeature && this.ITPMSet().headToNpc);
+  if !wantFeature {
+    if this.m_itpHLOn || this.m_itpHLGate {
+      this.ITPMHeadPark();
+    }
+    return;
+  }
+  hl.HeadLookHeartbeat();
+  let v: Vector4 = this.GetVelocity();
+  let still: Bool = Vector4.Length2D(v) < 0.15;
+  if still && !this.ITPMSet().headInScenes {
+    let dH: ref<AllBlackboardDefinitions> = GetAllBlackboardDefs();
+    let pH: ref<IBlackboard> = GameInstance.GetBlackboardSystem(this.GetGame()).GetLocalInstanced(this.GetEntityID(), dH.PlayerStateMachine);
+    if IsDefined(pH) && (pH.GetInt(dH.PlayerStateMachine.IsInWorkspot) != 0 || pH.GetInt(dH.PlayerStateMachine.SceneTier) >= 3) {
+      still = false;
+    }
+  }
+  if still && !this.m_itpHLOn {
+    hl.HeadLookStart();
+    this.ITPMNotify("Head follow started");
+    this.m_itpHLOn = true;
+    this.m_itpHLGateOff = 0.0;
+    if !this.m_itpHLGate {
+      this.ITPMHeadGate(true);
+    }
+  } else if still {
+    hl.HeadLookRetarget();
+  } else if this.m_itpHLOn {
+    hl.HeadLookRelease();
+    this.m_itpHLOn = false;
+    this.m_itpHLGateOff = now + 1.0;
+  }
+  if !this.m_itpHLOn && this.m_itpHLGate && this.m_itpHLGateOff > 0.0 && now >= this.m_itpHLGateOff {
+    this.ITPMHeadGate(false);
+    this.m_itpHLGateOff = 0.0;
+  }
+}
+
+@addMethod(PlayerPuppet)
+public func ITPMHeadPark() -> Void {
+  let hl: ref<TPPCameraHeadLook> = GameInstance.GetScriptableSystemsContainer(this.GetGame()).Get(n"TPPCameraHeadLook") as TPPCameraHeadLook;
+  if IsDefined(hl) {
+    hl.HeadLookStop();
+  }
+  if this.m_itpHLGate {
+    this.ITPMHeadGate(false);
+  }
+  this.m_itpHLOn = false;
+  this.m_itpHLGateOff = 0.0;
 }
 
 @addMethod(PlayerPuppet)
@@ -564,6 +675,9 @@ public func ITPMFeaturesPark() -> Void {
   AnimationControllerComponent.SetInputFloat(this, n"tpp_dash_kind", 0.0);
   bridge.SetDashConfig(true, 0, 0.50, 2.0833333);
   bridge.SetTppActive(false, false, false);
+  this.ITPMPickupDrop();
+  this.UnsetIndividualTimeDilation();
+  this.ITPMHeadPark();
 }
 
 
@@ -843,7 +957,10 @@ public func ITPMFinishExit() -> Void {
   if !this.m_itpTppOn {
     this.ITPMCustomAnims(false);                    // the mod's third-person animation states must be OFF in first person
     this.ITPMApplyTppAnim(true);
-    this.ITPMEquipTppHead(false, false);
+    if !(this.ITPMSet().keepHead && this.m_itpWanted) {
+      this.ITPMEquipTppHead(false, false);
+      this.m_itpHeadKept = false;
+    }
     let ocb: ref<ITPMOffCallback> = new ITPMOffCallback();
     ocb.player = this;
     GameInstance.GetDelaySystem(this.GetGame()).DelayCallback(ocb, 0.1, true);
@@ -1138,6 +1255,8 @@ public func ITPMWeaponDrawn() -> Bool {
   return IsDefined(ts.GetItemInSlot(this, t"AttachmentSlots.WeaponRight"));
 }
 
+@addField(PlayerPuppet) public let m_itpDrawUntil: Float;
+@addField(PlayerPuppet) public let m_itpHeadKept: Bool;
 @addField(PlayerPuppet) public let m_itpWhy: String;       // why third person is blocked right now (for the message)
 @addField(PlayerPuppet) public let m_itpHold: Int32;   // polls (0.1 s each) left before third person may come back
 
@@ -1162,6 +1281,10 @@ public func ITPMBlockHold() -> Int32 {
     hold = 3;                                    // quick first person key held
     why += "quick first person key; ";
   }
+  if EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGame())) < this.m_itpDrawUntil {
+    hold = Max(hold, 3);                         // a weapon key was just pressed: the gun is on its way
+    why += "weapon being drawn; ";
+  }
   if this.ITPMWeaponDrawn() && !this.ITPMSet().weaponShoulder {
     hold = 3;                                    // weapon holstered -> back after 0.3 s
     why += "weapon in hand; ";
@@ -1172,10 +1295,11 @@ public func ITPMBlockHold() -> Int32 {
   }
   let d: ref<AllBlackboardDefinitions> = GetAllBlackboardDefs();
   let psm: ref<IBlackboard> = GameInstance.GetBlackboardSystem(this.GetGame()).GetLocalInstanced(this.GetEntityID(), d.PlayerStateMachine);
-  let sceneLimit: Int32 = !this.ITPMSet().sceneTpp ? 3 : (this.ITPMSet().sceneEverything ? 99 : 5);      // original: tier >= 3 is a scene; 'conversations and sit-downs' keeps tiers 3-4
-  if IsDefined(psm) && psm.GetInt(d.PlayerStateMachine.SceneTier) >= sceneLimit {
+  // tiers 3-4 = conversations, sit-downs and other actions ("actions" option); tier 5 and up = real cinematics ("cutscenes" option)
+  let tier: Int32 = IsDefined(psm) ? psm.GetInt(d.PlayerStateMachine.SceneTier) : 0;
+  if tier >= 3 && ((tier < 5 && !this.ITPMSet().sceneTpp) || (tier >= 5 && !this.ITPMSet().sceneEverything)) {
     hold = Max(hold, 15);                       // cutscene / dialogue / staged scene -> back after 1.5 s
-    why += "scene (tier " + ToString(psm.GetInt(d.PlayerStateMachine.SceneTier)) + "); ";
+    why += "scene (tier " + ToString(tier) + "); ";
   }
   if IsDefined(psm) {
     // the original's "combat" group: in combat, takedowns, carrying a body, left-hand gadget or cyberware (1.25 s after it ends)
@@ -1189,7 +1313,7 @@ public func ITPMBlockHold() -> Int32 {
     // special actions: sitting/working at a workspot, forcing a door, personal-link hacks, terminals and controlled devices
     if psm.GetInt(d.PlayerStateMachine.IsInWorkspot) != 0 && !this.ITPMSet().sceneTpp {
       hold = Max(hold, 5);
-      why += "sitting/workspot (the setting 'Third person in conversations and sit-downs' is off); ";
+      why += "sitting/workspot (the setting 'Third person during actions and interactions' is off); ";
     }
     if psm.GetBool(d.PlayerStateMachine.IsForceOpeningDoor) || psm.GetBool(d.PlayerStateMachine.IsInteractingViaPersonalLink) {
       hold = Max(hold, 5);
@@ -1222,6 +1346,9 @@ public func ITPMBlockHold() -> Int32 {
 
 @addMethod(PlayerPuppet)
 public func ITPMSync() -> Void {
+  if this.ITPMSet().keepHead && this.m_itpWanted && !this.m_itpHeadKept && this.ITPMControlsOwnBody() {
+    this.m_itpHeadKept = this.ITPMEquipTppHead(true, false);       // the head model is loaded once and stays attached
+  }
   let h: Int32 = this.ITPMBlockHold();
   if h > 0 {
     this.m_itpHold = h;
@@ -1491,6 +1618,12 @@ protected cb func OnAction(action: ListenerAction, consumer: ListenerActionConsu
   let name: CName = ListenerAction.GetName(action);
   if this.ITPMHandleAction(name, action) {
     return result;
+  }
+  // pressing a weapon key while unarmed: start the way out of third person NOW, before the gun appears (the gun shows up late and the first-person camera shifts)
+  if this.m_itpTppOn && ListenerAction.IsButtonJustPressed(action) && !this.ITPMSet().weaponShoulder && !this.ITPMWeaponDrawn()
+    && (Equals(name, n"WeaponSlot1") || Equals(name, n"WeaponSlot2") || Equals(name, n"WeaponSlot3") || Equals(name, n"WeaponSlot4") || Equals(name, n"NextWeapon") || Equals(name, n"PreviousWeapon")) {
+    this.m_itpDrawUntil = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGame())) + 0.9;
+    this.ITPMSync();
   }
   if Equals(name, n"ToggleWalk") && ListenerAction.IsButtonJustPressed(action) {
     this.m_itpWanted = !this.m_itpWanted;

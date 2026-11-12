@@ -40,3 +40,6 @@ Findings from porting Immersive Third Person 2.0.1 to NightCity Console 1.9.0 / 
   (the DLL attaches it at runtime). Static workaround: let that set take the place of a rarely used set in the woman's entity list (`pwa_one_handed_blunt_dildo.anims`). The mod has no man's equivalent.
 - **Auto vault:** bridge switch `SetAutoVault` (original option `sprintAutoVault`, default off).
 - **Slide tilt / landing shake:** ported from `camera_motion.lua` (roll about the view axis, `q = yaw * pitch * roll`).
+
+## Weapon camera (experimental, not being worked on)
+The option "Shoulder camera with a weapon" (Mod Settings, Weapon camera page) keeps third person with a close over-the-shoulder camera while aiming. It is kept in the mod but is not under development: the original mod has no third-person gun animations, so the arms stay stiff, and the aim alignment with bullets was never verified. It may be revisited later.

@@ -142,9 +142,10 @@ public class ITPMSettings {
   public let scannerFpp: Bool = true;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
-  @runtimeProperty("ModSettings.category", "Controls")
-  @runtimeProperty("ModSettings.displayName", "Third person in conversations and sit-downs")
-  @runtimeProperty("ModSettings.description", "Off (default, like the original): first person whenever the game runs a scene, including sitting down and conversations. On: stay in third person while sitting, lying down and talking; real cinematics are still first person. Experimental.")
+  @runtimeProperty("ModSettings.category", "Cutscenes and actions")
+  @runtimeProperty("ModSettings.category.order", "13")
+  @runtimeProperty("ModSettings.displayName", "Third person during actions and interactions")
+  @runtimeProperty("ModSettings.description", "Sitting, lying down, drinking coffee, eating, washing, scrubbing, drinking water, conversations and similar actions. Off (default, like the original): first person during them. On: you stay in third person.")
   public let sceneTpp: Bool = false;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
@@ -154,9 +155,9 @@ public class ITPMSettings {
   public let terminalTpp: Bool = false;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
-  @runtimeProperty("ModSettings.category", "Controls")
-  @runtimeProperty("ModSettings.displayName", "Keep third person in cinematic cutscenes too")
-  @runtimeProperty("ModSettings.description", "Only with \"Third person in conversations and sit-downs\" on: also keep third person through real cinematics. Scene framing is made for first person and can look wrong.")
+  @runtimeProperty("ModSettings.category", "Cutscenes and actions")
+  @runtimeProperty("ModSettings.displayName", "Third person in cutscenes")
+  @runtimeProperty("ModSettings.description", "Off (default): first person during cinematic cutscenes. On: stay in third person. V can look a bit stiff there, because the scenes are made for first person.")
   public let sceneEverything: Bool = false;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
@@ -179,12 +180,6 @@ public class ITPMSettings {
   @runtimeProperty("ModSettings.displayName", "Remember perspective")
   @runtimeProperty("ModSettings.description", "When you load a save, go back to third person if you left it on (remembered per save).")
   public let rememberPerspective: Bool = false;
-
-  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
-  @runtimeProperty("ModSettings.category", "Controls")
-  @runtimeProperty("ModSettings.displayName", "Shoulder camera with a weapon (experimental)")
-  @runtimeProperty("ModSettings.description", "Off (default): first person when a weapon is drawn. On: stay in third person with a close over-the-shoulder camera whose aim follows the game's own aim. The aim animations were made for first person, so arms and spine may look odd.")
-  public let weaponShoulder: Bool = false;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Controls")
@@ -487,6 +482,12 @@ public class ITPMSettings {
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Weapon camera")
   @runtimeProperty("ModSettings.category.order", "12")
+  @runtimeProperty("ModSettings.displayName", "Shoulder camera with a weapon (experimental)")
+  @runtimeProperty("ModSettings.description", "Off (default): first person when a weapon is drawn. On: stay in third person with a close over-the-shoulder camera whose aim follows the game's own aim. The aim animations were made for first person, so arms and spine may look odd.")
+  public let weaponShoulder: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Weapon camera")
   @runtimeProperty("ModSettings.displayName", "Side offset")
   @runtimeProperty("ModSettings.description", "How far the camera sits to the right of V while a weapon is drawn (negative = left shoulder).")
   @runtimeProperty("ModSettings.step", "0.05")
@@ -562,6 +563,46 @@ public class ITPMSettings {
   @runtimeProperty("ModSettings.displayName", "Auto vault while sprinting")
   @runtimeProperty("ModSettings.description", "V vaults or climbs obstacles in her way while sprinting, without pressing jump. Off by default, like the original mod. Needs \"Original gameplay animations\" on.")
   public let autoVault: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Gameplay animations")
+  @runtimeProperty("ModSettings.displayName", "Item pickup animation")
+  @runtimeProperty("ModSettings.description", "V reaches out with her hand when she picks up loot (female V only, the original mod has no male version). Needs \"Original gameplay animations\" on.")
+  public let itemPickupAnim: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Pickup animation")
+  @runtimeProperty("ModSettings.category.order", "26")
+  @runtimeProperty("ModSettings.displayName", "Pickup animation speed")
+  @runtimeProperty("ModSettings.description", "How fast V's hand reaches out when she picks something up. 1 = the original speed, higher = faster. Only V is sped up, and only while the pickup plays.")
+  @runtimeProperty("ModSettings.step", "0.25")
+  @runtimeProperty("ModSettings.min", "1.0")
+  @runtimeProperty("ModSettings.max", "4.0")
+  public let pickupSpeed: Float = 2.0;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Gameplay animations")
+  @runtimeProperty("ModSettings.displayName", "Head follows camera")
+  @runtimeProperty("ModSettings.description", "While V stands still, her head turns toward where the camera looks. Needs \"Original gameplay animations\" on.")
+  public let headLook: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Gameplay animations")
+  @runtimeProperty("ModSettings.displayName", "Head turns to the person you talk to")
+  @runtimeProperty("ModSettings.description", "During conversations V looks at the speaker. Needs \"Head follows camera\" on.")
+  public let headToNpc: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Gameplay animations")
+  @runtimeProperty("ModSettings.displayName", "Head follows camera in cutscenes and while sitting")
+  @runtimeProperty("ModSettings.description", "Off (default): V's head follows the camera only in normal gameplay, not in cutscenes, dialogue scenes or while sitting. On: it also does it there.")
+  public let headInScenes: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Camera")
+  @runtimeProperty("ModSettings.displayName", "Keep the head loaded (experimental)")
+  @runtimeProperty("ModSettings.description", "Keeps V's third-person head attached even in first person, so it is already there when you switch (no late head). If you can see the head or hair in first person, turn this off.")
+  public let keepHead: Bool = false;
 
   // ---- Misc ----
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")

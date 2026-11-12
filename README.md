@@ -48,7 +48,7 @@ The original mod also has a small Windows program (a DLL) that does a few extra 
 - third person during cutscenes (the "scene redirect"),
 - a fix for the spine bending while aiming.
 
-These are optional edge cases: this port goes to first person for weapons, scenes and vehicles anyway. The loot-pickup hand animation is also not included.
+These are optional edge cases: this port goes to first person for weapons, scenes and vehicles anyway.
 
 ## What you need
 
@@ -105,15 +105,23 @@ Quit the game first. Your settings are kept. After a game or NightCity Console u
 Choose keys the game does not use (M = map, J = journal and I = inventory would do both things).
 
 **Other settings** are on the same page: five camera profiles (side, distance, height, FOV, shoulder and head angles), smooth switching and transition time, how close the camera may come to a wall,
-look speed, invert options, how many hotkeys to use, remembering your last view, third person while sitting / in cutscenes / at terminals / in elevators, the weapon camera, camera motion, auto vault (off by default), and on-screen messages.
+look speed, invert options, how many hotkeys to use, remembering your last view, third person during actions (sitting, drinking, eating) and in cutscenes, at terminals / in elevators, the weapon camera, camera motion, auto vault (off by default), and on-screen messages.
 Known limit: with a gun in hand V's arms look stiff, because the original mod has no third-person gun animations.
+
+## Newer options worth knowing
+
+- **Cutscenes and actions** (Mod Settings): separate switches for third person during cutscenes, and during actions like sitting, drinking coffee, eating or washing. Both are off by default.
+- **Pickup animation** (female V) with a speed setting, and **head follows camera** (with its own switch for cutscenes and sitting).
+- **Keep the head loaded** (experimental, off by default): keeps V's head attached in first person so it is there at once.
+- If the head still appears late, set the transition time (Camera page) to about 0.10.
 
 ## The animation swap: please read
 
 On Windows, a DLL swaps the mod's animations in while you play. That is not possible on a Mac, so the installer does it **once, before the game starts**:
-it builds two extra files from your copy of the mod and puts them next to the game's files:
+it builds three extra files from your copy of the mod and puts them next to the game's files:
 
 - `itp_mac_tpp_animsets.archive` (about 80 MB): the mod's third-person versions of V's everyday animations (walking, idles, world actions). It leaves out the main movement sets, the gun/aim sets and the quest-scene sets on purpose, because those made first-person aiming shift or cutscenes look stiff.
+- `itp_mac_tpp_aim.archive` (about 90 MB): the mod's versions of the gun/aim movement sets. You will hardly see a difference.
 - `itp_mac_consumables.archive` (6 MB, female V only): the healing animation.
 
 No game file is edited. The swap also applies in first person (it cannot change while you play). In testing, first person looked normal, but if **anything looks wrong with V's animations, switch it off**:

@@ -2,7 +2,7 @@
 # Switch the animation swap (two extra archive files) on or off without touching anything else. It only renames the files, never deletes them.
 # Usage: ./scripts/animations.sh on|off|status [game folder]
 GAME="${2:-$HOME/Library/Application Support/Steam/steamapps/common/Cyberpunk 2077}"
-M="$GAME/archive/Mac/mod"; NAMES=(itp_mac_tpp_animsets.archive itp_mac_consumables.archive)
+M="$GAME/archive/Mac/mod"; NAMES=(itp_mac_tpp_animsets.archive itp_mac_tpp_aim.archive itp_mac_consumables.archive)
 pgrep -x Cyberpunk2077 >/dev/null && { echo "the game is running: quit it first."; exit 1; }
 case "$1" in
   off) n=0; for N in $NAMES; do [[ -e "$M/$N" ]] && mv "$M/$N" "$M/$N.disabled" && n=$((n+1)); done
