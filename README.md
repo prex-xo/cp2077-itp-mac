@@ -15,9 +15,9 @@ It is **not affiliated with or endorsed by CybrDrake**.
 
 ## Demo video
 
-[![Watch the demo video](https://img.youtube.com/vi/Qqs_4r0ztXE/hqdefault.jpg)](https://youtu.be/Qqs_4r0ztXE)
+[![Watch the demo video](https://img.youtube.com/vi/D_FMYAyaJ0c/hqdefault.jpg)](https://youtu.be/D_FMYAyaJ0c)
 
-(Unlisted on YouTube, so it is only reachable from this link: https://youtu.be/Qqs_4r0ztXE)
+(Unlisted on YouTube, so it is only reachable from this link: https://youtu.be/D_FMYAyaJ0c)
 
 ## What you get
 
