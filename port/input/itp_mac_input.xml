@@ -22,6 +22,210 @@
         <button id="IK_Period" />
     </mapping>
 
+
+    <!-- one action per key a user may bind on the Mod Settings 'Key bindings' page (ignored unless that page is switched on) -->
+    <mapping name="ITP_K_A_Button" type="Button">
+        <button id="IK_A" />
+    </mapping>
+    <mapping name="ITP_K_B_Button" type="Button">
+        <button id="IK_B" />
+    </mapping>
+    <mapping name="ITP_K_C_Button" type="Button">
+        <button id="IK_C" />
+    </mapping>
+    <mapping name="ITP_K_D_Button" type="Button">
+        <button id="IK_D" />
+    </mapping>
+    <mapping name="ITP_K_E_Button" type="Button">
+        <button id="IK_E" />
+    </mapping>
+    <mapping name="ITP_K_F_Button" type="Button">
+        <button id="IK_F" />
+    </mapping>
+    <mapping name="ITP_K_G_Button" type="Button">
+        <button id="IK_G" />
+    </mapping>
+    <mapping name="ITP_K_H_Button" type="Button">
+        <button id="IK_H" />
+    </mapping>
+    <mapping name="ITP_K_I_Button" type="Button">
+        <button id="IK_I" />
+    </mapping>
+    <mapping name="ITP_K_J_Button" type="Button">
+        <button id="IK_J" />
+    </mapping>
+    <mapping name="ITP_K_K_Button" type="Button">
+        <button id="IK_K" />
+    </mapping>
+    <mapping name="ITP_K_L_Button" type="Button">
+        <button id="IK_L" />
+    </mapping>
+    <mapping name="ITP_K_M_Button" type="Button">
+        <button id="IK_M" />
+    </mapping>
+    <mapping name="ITP_K_N_Button" type="Button">
+        <button id="IK_N" />
+    </mapping>
+    <mapping name="ITP_K_O_Button" type="Button">
+        <button id="IK_O" />
+    </mapping>
+    <mapping name="ITP_K_P_Button" type="Button">
+        <button id="IK_P" />
+    </mapping>
+    <mapping name="ITP_K_Q_Button" type="Button">
+        <button id="IK_Q" />
+    </mapping>
+    <mapping name="ITP_K_R_Button" type="Button">
+        <button id="IK_R" />
+    </mapping>
+    <mapping name="ITP_K_S_Button" type="Button">
+        <button id="IK_S" />
+    </mapping>
+    <mapping name="ITP_K_T_Button" type="Button">
+        <button id="IK_T" />
+    </mapping>
+    <mapping name="ITP_K_U_Button" type="Button">
+        <button id="IK_U" />
+    </mapping>
+    <mapping name="ITP_K_V_Button" type="Button">
+        <button id="IK_V" />
+    </mapping>
+    <mapping name="ITP_K_W_Button" type="Button">
+        <button id="IK_W" />
+    </mapping>
+    <mapping name="ITP_K_X_Button" type="Button">
+        <button id="IK_X" />
+    </mapping>
+    <mapping name="ITP_K_Y_Button" type="Button">
+        <button id="IK_Y" />
+    </mapping>
+    <mapping name="ITP_K_Z_Button" type="Button">
+        <button id="IK_Z" />
+    </mapping>
+    <mapping name="ITP_K_1_Button" type="Button">
+        <button id="IK_1" />
+    </mapping>
+    <mapping name="ITP_K_2_Button" type="Button">
+        <button id="IK_2" />
+    </mapping>
+    <mapping name="ITP_K_3_Button" type="Button">
+        <button id="IK_3" />
+    </mapping>
+    <mapping name="ITP_K_4_Button" type="Button">
+        <button id="IK_4" />
+    </mapping>
+    <mapping name="ITP_K_5_Button" type="Button">
+        <button id="IK_5" />
+    </mapping>
+    <mapping name="ITP_K_6_Button" type="Button">
+        <button id="IK_6" />
+    </mapping>
+    <mapping name="ITP_K_7_Button" type="Button">
+        <button id="IK_7" />
+    </mapping>
+    <mapping name="ITP_K_8_Button" type="Button">
+        <button id="IK_8" />
+    </mapping>
+    <mapping name="ITP_K_9_Button" type="Button">
+        <button id="IK_9" />
+    </mapping>
+    <mapping name="ITP_K_0_Button" type="Button">
+        <button id="IK_0" />
+    </mapping>
+    <mapping name="ITP_K_F1_Button" type="Button">
+        <button id="IK_F1" />
+    </mapping>
+    <mapping name="ITP_K_F2_Button" type="Button">
+        <button id="IK_F2" />
+    </mapping>
+    <mapping name="ITP_K_F3_Button" type="Button">
+        <button id="IK_F3" />
+    </mapping>
+    <mapping name="ITP_K_F4_Button" type="Button">
+        <button id="IK_F4" />
+    </mapping>
+    <mapping name="ITP_K_F5_Button" type="Button">
+        <button id="IK_F5" />
+    </mapping>
+    <mapping name="ITP_K_F6_Button" type="Button">
+        <button id="IK_F6" />
+    </mapping>
+    <mapping name="ITP_K_F7_Button" type="Button">
+        <button id="IK_F7" />
+    </mapping>
+    <mapping name="ITP_K_F8_Button" type="Button">
+        <button id="IK_F8" />
+    </mapping>
+    <mapping name="ITP_K_F9_Button" type="Button">
+        <button id="IK_F9" />
+    </mapping>
+    <mapping name="ITP_K_F10_Button" type="Button">
+        <button id="IK_F10" />
+    </mapping>
+    <mapping name="ITP_K_F11_Button" type="Button">
+        <button id="IK_F11" />
+    </mapping>
+    <mapping name="ITP_K_F12_Button" type="Button">
+        <button id="IK_F12" />
+    </mapping>
+    <mapping name="ITP_K_Period_Button" type="Button">
+        <button id="IK_Period" />
+    </mapping>
+    <mapping name="ITP_K_Comma_Button" type="Button">
+        <button id="IK_Comma" />
+    </mapping>
+    <mapping name="ITP_K_Semicolon_Button" type="Button">
+        <button id="IK_Semicolon" />
+    </mapping>
+    <mapping name="ITP_K_SingleQuote_Button" type="Button">
+        <button id="IK_SingleQuote" />
+    </mapping>
+    <mapping name="ITP_K_LeftBracket_Button" type="Button">
+        <button id="IK_LeftBracket" />
+    </mapping>
+    <mapping name="ITP_K_RightBracket_Button" type="Button">
+        <button id="IK_RightBracket" />
+    </mapping>
+    <mapping name="ITP_K_Backslash_Button" type="Button">
+        <button id="IK_Backslash" />
+    </mapping>
+    <mapping name="ITP_K_Minus_Button" type="Button">
+        <button id="IK_Minus" />
+    </mapping>
+    <mapping name="ITP_K_Equals_Button" type="Button">
+        <button id="IK_Equals" />
+    </mapping>
+    <mapping name="ITP_K_Up_Button" type="Button">
+        <button id="IK_Up" />
+    </mapping>
+    <mapping name="ITP_K_Down_Button" type="Button">
+        <button id="IK_Down" />
+    </mapping>
+    <mapping name="ITP_K_Left_Button" type="Button">
+        <button id="IK_Left" />
+    </mapping>
+    <mapping name="ITP_K_Right_Button" type="Button">
+        <button id="IK_Right" />
+    </mapping>
+    <mapping name="ITP_K_Home_Button" type="Button">
+        <button id="IK_Home" />
+    </mapping>
+    <mapping name="ITP_K_End_Button" type="Button">
+        <button id="IK_End" />
+    </mapping>
+    <mapping name="ITP_K_PageUp_Button" type="Button">
+        <button id="IK_PageUp" />
+    </mapping>
+    <mapping name="ITP_K_PageDown_Button" type="Button">
+        <button id="IK_PageDown" />
+    </mapping>
+    <mapping name="ITP_K_Insert_Button" type="Button">
+        <button id="IK_Insert" />
+    </mapping>
+    <mapping name="ITP_K_Delete_Button" type="Button">
+        <button id="IK_Delete" />
+    </mapping>
+
     <context name="ITPMacContext">
         <action name="ITP_QuickFpp" map="ITP_QuickFpp_Button" />
         <action name="ITP_Shoulder" map="ITP_Shoulder_Button" />
@@ -29,6 +233,73 @@
         <action name="ITP_ProfilePrev" map="ITP_ProfilePrev_Button" />
         <action name="ITP_ProfileNext" map="ITP_ProfileNext_Button" />
         <action name="ITP_FreeLook" map="ITP_FreeLook_Button" />
+        <action name="ITP_K_A" map="ITP_K_A_Button" />
+        <action name="ITP_K_B" map="ITP_K_B_Button" />
+        <action name="ITP_K_C" map="ITP_K_C_Button" />
+        <action name="ITP_K_D" map="ITP_K_D_Button" />
+        <action name="ITP_K_E" map="ITP_K_E_Button" />
+        <action name="ITP_K_F" map="ITP_K_F_Button" />
+        <action name="ITP_K_G" map="ITP_K_G_Button" />
+        <action name="ITP_K_H" map="ITP_K_H_Button" />
+        <action name="ITP_K_I" map="ITP_K_I_Button" />
+        <action name="ITP_K_J" map="ITP_K_J_Button" />
+        <action name="ITP_K_K" map="ITP_K_K_Button" />
+        <action name="ITP_K_L" map="ITP_K_L_Button" />
+        <action name="ITP_K_M" map="ITP_K_M_Button" />
+        <action name="ITP_K_N" map="ITP_K_N_Button" />
+        <action name="ITP_K_O" map="ITP_K_O_Button" />
+        <action name="ITP_K_P" map="ITP_K_P_Button" />
+        <action name="ITP_K_Q" map="ITP_K_Q_Button" />
+        <action name="ITP_K_R" map="ITP_K_R_Button" />
+        <action name="ITP_K_S" map="ITP_K_S_Button" />
+        <action name="ITP_K_T" map="ITP_K_T_Button" />
+        <action name="ITP_K_U" map="ITP_K_U_Button" />
+        <action name="ITP_K_V" map="ITP_K_V_Button" />
+        <action name="ITP_K_W" map="ITP_K_W_Button" />
+        <action name="ITP_K_X" map="ITP_K_X_Button" />
+        <action name="ITP_K_Y" map="ITP_K_Y_Button" />
+        <action name="ITP_K_Z" map="ITP_K_Z_Button" />
+        <action name="ITP_K_1" map="ITP_K_1_Button" />
+        <action name="ITP_K_2" map="ITP_K_2_Button" />
+        <action name="ITP_K_3" map="ITP_K_3_Button" />
+        <action name="ITP_K_4" map="ITP_K_4_Button" />
+        <action name="ITP_K_5" map="ITP_K_5_Button" />
+        <action name="ITP_K_6" map="ITP_K_6_Button" />
+        <action name="ITP_K_7" map="ITP_K_7_Button" />
+        <action name="ITP_K_8" map="ITP_K_8_Button" />
+        <action name="ITP_K_9" map="ITP_K_9_Button" />
+        <action name="ITP_K_0" map="ITP_K_0_Button" />
+        <action name="ITP_K_F1" map="ITP_K_F1_Button" />
+        <action name="ITP_K_F2" map="ITP_K_F2_Button" />
+        <action name="ITP_K_F3" map="ITP_K_F3_Button" />
+        <action name="ITP_K_F4" map="ITP_K_F4_Button" />
+        <action name="ITP_K_F5" map="ITP_K_F5_Button" />
+        <action name="ITP_K_F6" map="ITP_K_F6_Button" />
+        <action name="ITP_K_F7" map="ITP_K_F7_Button" />
+        <action name="ITP_K_F8" map="ITP_K_F8_Button" />
+        <action name="ITP_K_F9" map="ITP_K_F9_Button" />
+        <action name="ITP_K_F10" map="ITP_K_F10_Button" />
+        <action name="ITP_K_F11" map="ITP_K_F11_Button" />
+        <action name="ITP_K_F12" map="ITP_K_F12_Button" />
+        <action name="ITP_K_Period" map="ITP_K_Period_Button" />
+        <action name="ITP_K_Comma" map="ITP_K_Comma_Button" />
+        <action name="ITP_K_Semicolon" map="ITP_K_Semicolon_Button" />
+        <action name="ITP_K_SingleQuote" map="ITP_K_SingleQuote_Button" />
+        <action name="ITP_K_LeftBracket" map="ITP_K_LeftBracket_Button" />
+        <action name="ITP_K_RightBracket" map="ITP_K_RightBracket_Button" />
+        <action name="ITP_K_Backslash" map="ITP_K_Backslash_Button" />
+        <action name="ITP_K_Minus" map="ITP_K_Minus_Button" />
+        <action name="ITP_K_Equals" map="ITP_K_Equals_Button" />
+        <action name="ITP_K_Up" map="ITP_K_Up_Button" />
+        <action name="ITP_K_Down" map="ITP_K_Down_Button" />
+        <action name="ITP_K_Left" map="ITP_K_Left_Button" />
+        <action name="ITP_K_Right" map="ITP_K_Right_Button" />
+        <action name="ITP_K_Home" map="ITP_K_Home_Button" />
+        <action name="ITP_K_End" map="ITP_K_End_Button" />
+        <action name="ITP_K_PageUp" map="ITP_K_PageUp_Button" />
+        <action name="ITP_K_PageDown" map="ITP_K_PageDown_Button" />
+        <action name="ITP_K_Insert" map="ITP_K_Insert_Button" />
+        <action name="ITP_K_Delete" map="ITP_K_Delete_Button" />
     </context>
 
     <context name="Locomotion" append="true">

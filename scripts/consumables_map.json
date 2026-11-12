@@ -1,0 +1,11 @@
+{
+ "replace": [
+  {
+   "target": "6b2441a653ebcdff",
+   "source": "3786bd49e4329763",
+   "archive": "?",
+   "note": "woman: the mod's tpp_consumable/tpp_buff set takes the place of the unused dildo weapon set"
+  }
+ ],
+ "_about": "Woman only: the mod's set with the third-person consumable/buff clips takes the place of a rarely used set (the 'blunt dildo' weapon animations). The mod has no man's version."
+}

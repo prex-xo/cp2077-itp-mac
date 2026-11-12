@@ -2,6 +2,51 @@
 // Own code. Values are saved by Mod Settings. Hotkeys are NOT here: they live in r6/input/itp_mac_input.xml.
 
 public class ITPMSettings {
+
+  // ---- Key bindings (used when "Use these key bindings" is on) ----
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Key bindings")
+  @runtimeProperty("ModSettings.category.order", "5")
+  @runtimeProperty("ModSettings.displayName", "Use these key bindings")
+  @runtimeProperty("ModSettings.description", "On: the keys below are used and the key file (r6/input/itp_mac_input.xml) is IGNORED, so the default keys stop working. Off: the key file is used. Pick keys the game does not use (for example not M = map, J = journal, I = inventory), otherwise both actions happen. The third-person toggle is the game's own walk-toggle key (Settings > Controls), G by default.")
+  public let useMenuKeys: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Key bindings")
+  @runtimeProperty("ModSettings.displayName", "Free look on/off")
+  @runtimeProperty("ModSettings.description", "Default key: . . With \"Use these key bindings\" on, this key replaces the default.")
+  public let keyFreeLook: EInputKey = EInputKey.IK_Period;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Key bindings")
+  @runtimeProperty("ModSettings.displayName", "Quick first person (hold)")
+  @runtimeProperty("ModSettings.description", "Default key: , . With \"Use these key bindings\" on, this key replaces the default.")
+  public let keyQuick: EInputKey = EInputKey.IK_Comma;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Key bindings")
+  @runtimeProperty("ModSettings.displayName", "Shoulder zoom (hold)")
+  @runtimeProperty("ModSettings.description", "Default key: ; . With \"Use these key bindings\" on, this key replaces the default.")
+  public let keyShoulder: EInputKey = EInputKey.IK_Semicolon;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Key bindings")
+  @runtimeProperty("ModSettings.displayName", "Front view (hold)")
+  @runtimeProperty("ModSettings.description", "Default key: ' . With \"Use these key bindings\" on, this key replaces the default.")
+  public let keyFront: EInputKey = EInputKey.IK_SingleQuote;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Key bindings")
+  @runtimeProperty("ModSettings.displayName", "Previous camera profile")
+  @runtimeProperty("ModSettings.description", "Default key: [ . With \"Use these key bindings\" on, this key replaces the default.")
+  public let keyPrev: EInputKey = EInputKey.IK_LeftBracket;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Key bindings")
+  @runtimeProperty("ModSettings.displayName", "Next camera profile")
+  @runtimeProperty("ModSettings.description", "Default key: ] . With \"Use these key bindings\" on, this key replaces the default.")
+  public let keyNext: EInputKey = EInputKey.IK_RightBracket;
+
   // ---- Camera ----
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Camera")
@@ -77,15 +122,15 @@ public class ITPMSettings {
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Controls")
-  @runtimeProperty("ModSettings.displayName", "Free look when standing still")
-  @runtimeProperty("ModSettings.description", "While V stands still the mouse orbits the camera around her. As soon as she moves it is normal third person again.")
-  public let autoFreeLook: Bool = true;
-
-  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
-  @runtimeProperty("ModSettings.category", "Controls")
   @runtimeProperty("ModSettings.displayName", "First person in scanner / quickhacks")
   @runtimeProperty("ModSettings.description", "Switch to first person while the scanner / quickhack view (Tab) is open. Third person makes that slow-motion view choppy.")
   public let scannerFpp: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Controls")
+  @runtimeProperty("ModSettings.displayName", "Third person while only in combat alert")
+  @runtimeProperty("ModSettings.description", "Off (default, like the original): first person whenever you are in combat. On: stay in third person in combat as long as nothing is in your hand (a drawn weapon, takedowns and left-hand cyberware still switch).")
+  public let alertTpp: Bool = false;
 
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Controls")
@@ -321,6 +366,20 @@ public class ITPMSettings {
   @runtimeProperty("ModSettings.displayName", "Dynamic height")
   @runtimeProperty("ModSettings.description", "The camera drops when you crouch, slide or sprint.")
   public let dynamicHeight: Bool = true;
+
+  // ---- Original gameplay features ----
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Gameplay animations")
+  @runtimeProperty("ModSettings.category.order", "25")
+  @runtimeProperty("ModSettings.displayName", "Original gameplay animations")
+  @runtimeProperty("ModSettings.description", "Switches on the original mod's own scripts for dash, consumables, item pickup and similar actions. Experimental on Mac: turn it off if movement or actions feel wrong.")
+  public let gameplayFeatures: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Gameplay animations")
+  @runtimeProperty("ModSettings.displayName", "Auto vault while sprinting")
+  @runtimeProperty("ModSettings.description", "V vaults or climbs obstacles in her way while sprinting, without pressing jump. Off by default, like the original mod. Needs \"Original gameplay animations\" on.")
+  public let autoVault: Bool = false;
 
   // ---- Misc ----
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")

@@ -29,3 +29,14 @@ Findings from porting Immersive Third Person 2.0.1 to NightCity Console 1.9.0 / 
 - Camera/ transition findings: the first-person camera must not be snapped to neutral at the start; start the third-person view from the current first-person pitch and FOV.
 - Elevators: the original forces first person (PSM `IsPlayerInsideElevator`); a plain `Static` ray does not see the cabin walls, `Visibility` helps.
 - Scanner / quickhack view: PSM `Vision == Focus`.
+
+- **First-person aim shift:** swapping the four main locomotion sets (the mod's `074ea17b..`, `5efb1c71..`, `5ba54ed3..`, `603042cd..`, which carry modified `fpp_*` clips) made the first-person camera shift while aiming. They are left out. The gun/aim sets are left out too (not proven to matter).
+- The camera loop must not re-enable the mod's third-person animation states (`xtpp_custom`, `tpp_jump_latch`) while gliding back to first person, otherwise first person keeps them on.
+- Mouse-axis listeners (`CameraMouseX/Y`, `CameraX/Y`): register once, never unregister (the game may use the same ones).
+
+- **Key bindings page:** the game's callback system (Codeware `KeyInputEvent`, `GameInstance.GetCallbackSystem().RegisterCallback(n"Input/Key", ...)` with `InputTarget.Key(...)`) delivered no key presses on Mac.
+  What works: Input Loader actions. The key file defines an action `ITP_K_<key>` for 67 keys; the script maps the pressed key (`EnumValueFromString("EInputKey", "IK_" + key)`) to the Mod Settings binding.
+- **Consumable animation (woman):** V's entity files list the vanilla consumable sets by path (hash = FNV-1a 64 of the lowercase path), but the mod's third-person consumable/buff clips are in a set no entity lists
+  (the DLL attaches it at runtime). Static workaround: let that set take the place of a rarely used set in the woman's entity list (`pwa_one_handed_blunt_dildo.anims`). The mod has no man's equivalent.
+- **Auto vault:** bridge switch `SetAutoVault` (original option `sprintAutoVault`, default off).
+- **Slide tilt / landing shake:** ported from `camera_motion.lua` (roll about the view axis, `q = yaw * pitch * roll`).

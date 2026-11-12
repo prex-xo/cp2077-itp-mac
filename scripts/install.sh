@@ -60,9 +60,11 @@ fi
 echo "    compiles OK"
 
 if (( ANIM )); then
-  echo "3/5 building the animation swap from your copy of the mod (about 520 MB) ..."
+  echo "3/5 building the animation swap from your copy of the mod (about 420 MB) ..."
   python3 -I "$HERE/scripts/build_swap_archive.py" "$ARCH/immersive_third_person.archive" "$HERE/scripts/animset_map.json" "$BUILD/itp_mac_tpp_animsets.archive" | tail -1
   python3 -I "$HERE/scripts/verify_swap_archive.py" "$BUILD/itp_mac_tpp_animsets.archive" "$ARCH/immersive_third_person.archive" "$HERE/scripts/animset_map.json" | tail -1
+  python3 -I "$HERE/scripts/build_swap_archive.py" "$ARCH/immersive_third_person.archive" "$HERE/scripts/consumables_map.json" "$BUILD/itp_mac_consumables.archive" | tail -1
+  python3 -I "$HERE/scripts/verify_swap_archive.py" "$BUILD/itp_mac_consumables.archive" "$ARCH/immersive_third_person.archive" "$HERE/scripts/consumables_map.json" | tail -1
 else
   echo "3/5 animation swap skipped (--no-animations)"
 fi
@@ -80,6 +82,8 @@ done
 if (( ANIM )); then
   cp "$BUILD/itp_mac_tpp_animsets.archive" "$GAME/archive/Mac/mod/itp_mac_tpp_animsets.archive"
   cmp "$BUILD/itp_mac_tpp_animsets.archive" "$GAME/archive/Mac/mod/itp_mac_tpp_animsets.archive" || die "copy of the animation archive is corrupt"
+  cp "$BUILD/itp_mac_consumables.archive" "$GAME/archive/Mac/mod/itp_mac_consumables.archive"
+  cmp "$BUILD/itp_mac_consumables.archive" "$GAME/archive/Mac/mod/itp_mac_consumables.archive" || die "copy of the consumables archive is corrupt"
 fi
 # NOTE: immersive_third_person.archive.xl (body patch) is intentionally NOT installed: the port was tested without it.
 
@@ -91,7 +95,7 @@ files = [os.path.join(g, "r6/input/itp_mac_input.xml")]
 for d in ("r6/scripts/immersive_third_person", "r6/tweaks/immersive_third_person"):
     for r, _, fs in os.walk(os.path.join(g, d)):
         files += [os.path.join(r, f) for f in fs]
-names = ["immersive_third_person.archive", "immersive_third_person_v_lipsync_en.archive"] + (["itp_mac_tpp_animsets.archive"] if anim == "1" else [])
+names = ["immersive_third_person.archive", "immersive_third_person_v_lipsync_en.archive"] + (["itp_mac_tpp_animsets.archive", "itp_mac_consumables.archive"] if anim == "1" else [])
 files += [os.path.join(g, "archive/Mac/mod", f) for f in names]
 json.dump({"name": "immersive-third-person-mac-port", "source": "mac port (own patches + your copy of the original mod)", "files": sorted(files)}, open(m, "w"), indent=2)
 PY
@@ -101,7 +105,7 @@ if (( ANIM )); then
 cat <<'NOTE'
 
 NOTE ABOUT ANIMATIONS: the animation swap replaces the game's own animation sets for V (walking, running, idle, jumping, ...)
-with the mod's third-person versions, in BOTH first and third person. It is an extra file (archive/Mac/mod/itp_mac_tpp_animsets.archive);
+with the mod's third-person versions, in BOTH first and third person. It is two extra files (archive/Mac/mod/itp_mac_tpp_animsets.archive and itp_mac_consumables.archive);
 no game file is edited. If anything looks wrong with V's animations, switch it off with:
     ./scripts/animations.sh off        (and back on with: ./scripts/animations.sh on)
 NOTE
