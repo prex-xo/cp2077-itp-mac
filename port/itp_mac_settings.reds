@@ -550,6 +550,13 @@ public class ITPMSettings {
   @runtimeProperty("ModSettings.description", "The camera drops when you crouch, slide or sprint.")
   public let dynamicHeight: Bool = true;
 
+  // ---- Live animation swap (the Mac plugin) ----
+  @runtimeProperty("ModSettings.mod", "Immersive Third Person")
+  @runtimeProperty("ModSettings.category", "Gameplay animations")
+  @runtimeProperty("ModSettings.displayName", "Live animation swap (experimental)")
+  @runtimeProperty("ModSettings.description", "Uses the ITPMac plugin to give V the mod's third-person animations only while third person is on, and the game's own animations in first person. Needs the plugin and the original mod's archive. Experimental.")
+  public let liveSwap: Bool = true;
+
   // ---- Original gameplay features ----
   @runtimeProperty("ModSettings.mod", "Immersive Third Person")
   @runtimeProperty("ModSettings.category", "Gameplay animations")

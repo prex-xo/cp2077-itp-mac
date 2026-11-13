@@ -556,6 +556,7 @@ public func ITPMFeaturesTick(force: Bool) -> Void {
   bridge.SetAutoVault(this.ITPMSet().autoVault);
   this.ITPMPickupTick(bridge, dtF, now);
   this.ITPMHeadTick(now);
+  this.ITPMLiveSwapTick(false);
 }
 
 // ---- loot pickup hand animation (what the original's Lua did: the bridge notes a pickup, we raise a graph pulse for 2 s) ----
@@ -677,6 +678,7 @@ public func ITPMFeaturesPark() -> Void {
   bridge.SetTppActive(false, false, false);
   this.ITPMPickupDrop();
   this.UnsetIndividualTimeDilation();
+  this.ITPMLiveSwapPark();
   this.ITPMHeadPark();
 }
 
@@ -1738,4 +1740,13 @@ protected cb func OnGameAttached() -> Bool {
   this.RegisterInputListener(this, n"ITP_FreeLook");
   GameInstance.GetQuestsSystem(this.GetGame()).SetFact(n"immersive_third_person_notice_seen", 1);
   return wrappedMethod();
+}
+
+// ---- live animation swap hooks: do nothing here; port/itp_mac_liveswap.reds (installed only when the ITPMac plugin is installed) wraps them ----
+@addMethod(PlayerPuppet)
+public func ITPMLiveSwapTick(force: Bool) -> Void {
+}
+
+@addMethod(PlayerPuppet)
+public func ITPMLiveSwapPark() -> Void {
 }

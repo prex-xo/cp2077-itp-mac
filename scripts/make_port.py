@@ -45,6 +45,7 @@ patch("tpp_camera_headlook.reds",
 # our own files
 for name, target in (("itp_mac_compat.reds", "zz_itp_mac_compat.reds"),
                      ("itp_mac_camera.reds", "zz_itp_mac_camera.reds"),
-                     ("itp_mac_settings.reds", "zz_itp_mac_settings.reds")):
+                     ("itp_mac_settings.reds", "zz_itp_mac_settings.reds"),
+                     ("itp_mac_liveswap.reds", "zz_itp_mac_liveswap.reds")):
     shutil.copy(os.path.join(root, "port", name), os.path.join(dst, target))
 print("built:", dst)

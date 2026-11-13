@@ -29,7 +29,7 @@ Press **G** to switch between first and third person. Everything below works:
 - **5 camera profiles** you can edit, **shoulder zoom**, **front view**, **quick first-person peek**, and **free look**.
 - The camera **pulls in at walls** instead of going through them.
 - **Camera motion**: bob when walking, shake when running, drop when crouching or sliding, lean when sliding, bump when landing hard.
-- **The mod's animations**: dash, healing animation (female V), idle animations, **loot pickup animation** (female V) with a speed setting, and an optional **auto vault** while sprinting.
+- **The mod's animations**: V gets the mod's third-person animations (walking, idle, sitting down and getting up in cutscenes, blinking and more) **only while third person is on**, and the game's own animations in first person, through a small plugin (see *The animation swap*). Also dash, healing animation, **loot pickup animation** with a speed setting, and an optional **auto vault** while sprinting.
 - **Head follows camera**: when V stands still, her head turns to where the camera looks.
 - A **settings page** in the game and **rebindable keys**.
 
@@ -105,7 +105,8 @@ Each profile has: **Side offset** (right of V, negative = left shoulder), **Dist
 |---|---|
 | Original gameplay animations (on) | The original mod's own scripts for dash, consumables, pickup and similar. Turn it off if movement feels wrong. The next four settings need it on. |
 | Auto vault while sprinting (off) | V vaults or climbs obstacles while sprinting, without pressing jump. |
-| Item pickup animation (on) | V reaches out with her hand when she picks up loot (female V only). |
+| Live animation swap, experimental (on) | Gives V the mod's third-person animations only while third person is on, and the game's own in first person. Needs the ITPMac plugin that the installer builds. Turn it off if V's animations look wrong. |
+| Item pickup animation (on) | V reaches out with her hand when she picks up loot. |
 | Head follows camera (on) | While V stands still, her head turns toward where the camera looks. |
 | Head turns to the person you talk to (off) | During conversations V looks at the speaker. |
 | Head follows camera in cutscenes and while sitting (off) | Off: head follow only in normal gameplay. On: also in cutscenes, dialogue scenes and while sitting. |
@@ -129,23 +130,23 @@ The setting **Shoulder camera with a weapon (off)** keeps third person with a cl
 
 - **Stiff arms with a gun** in third person (the original mod has no third-person gun animations).
 - Cutscenes can look a little stiff in third person, which is why those options are off by default.
-- Tested mostly with **female V**. Male V works the same way, but has not been tested as much, and the healing and pickup animations only exist for female V (the original mod has none for male V).
+- Tested mostly with **female V**. Male V works the same way, but has not been tested as much.
 - Tested by one person on one Mac (Apple M5 Pro, macOS 27.2). Expect some rough edges.
 
 ## What is not ported
 
-The original mod also has a small Windows program (a DLL) that does a few extra jobs. A Windows DLL cannot run on a Mac, so these are **not ported**:
+The original mod also has a small Windows program (a DLL) with a few extra jobs. A Windows DLL cannot run on a Mac. Its animation swapping (the live swap and the cutscene animations) is **replaced here by a native Mac plugin**. These parts are **not ported**:
 
-- GTA-style "run in any direction relative to the camera" movement,
 - the head render guard (stops V's head fading when the camera is very close),
-- the scene redirect (makes V use the mod's animations inside cutscenes, so V can look stiff there).
+- sprinting in every direction relative to the camera, and the GTA-style movement it belongs to (tried, and the normal movement is better),
+- the loot range extension.
 
-Also left out: the original's developer API and its window (Mod Settings replaces the window), about 300 animation sets that could not be identified, and the four main movement sets (they shifted the first-person aim).
+Also left out: the original's developer API and its window (Mod Settings replaces the window), and about 300 animation sets that could not be identified.
 
 ## Future plan
 
-- **A native Mac plugin** could bring the DLL features over, using NightCity Console's RED4ext. It would mean reverse engineering the DLL and finding the matching functions in the Mac game, which is a large job with an uncertain result. The first candidate would be the GTA-style movement. Details are in [NOTES.md](NOTES.md).
-- Asking the original author how the DLL does these jobs would save most of the work.
+- The head render guard and sprint-in-every-direction are possible later with the same kind of plugin. Details are in [NOTES.md](NOTES.md).
+- A male V check of the live animation swap (it uses the mod's male variants, but it has only been tested with female V).
 - Proposing this port as a NightCity Console "Optional Mod" (see below).
 
 ## What you need
@@ -154,7 +155,8 @@ Also left out: the original's developer API and its window (Mod Settings replace
 - **NightCity Console for Mac 1.9.0** (by ysrdevs): https://github.com/ysrdevs/nightcity-console-mac/releases
 - The **original mod** from Nexus (free account): https://www.nexusmods.com/cyberpunk2077/mods/32203
   Download the main file **"Immersive Third Person V2" 2.0.1** and unzip it somewhere (about 1.2 GB).
-- Python 3 (it comes with the Xcode command line tools: run `xcode-select --install` if `python3` is missing).
+- Python 3 and a C++ compiler: both come with the Xcode command line tools (run `xcode-select --install` if `python3` or `clang++` is missing). The installer builds a small plugin with it.
+- Version **2.0.1** of the original mod (the plugin reads the mod's animation table, which is tied to that version).
 
 ## Install
 
@@ -170,7 +172,7 @@ Also left out: the original's developer API and its window (Mod Settings replace
    ./scripts/install.sh "/path/to/unzipped/mod"
    ```
    It builds the Mac scripts from your copy, test-compiles them, and copies everything into the game. It only **adds** files and never overwrites game files.
-   It asks if you want the animation swap (see below).
+   It asks if you want the animations (see below). `--no-animations` skips them and `--static-animations` uses the older way (big files, see below).
 5. **Start the game with NightCity Console's Play button** (not directly from Steam), load a save, and press **G**.
 
 To remove everything: `./scripts/uninstall.sh`
@@ -206,22 +208,24 @@ All other settings are listed in **All settings** above.
 
 ## The animation swap: please read
 
-On Windows, a DLL swaps the mod's animations in while you play. That is not possible on a Mac, so the installer does it **once, before the game starts**:
-it builds three extra files from your copy of the mod and puts them next to the game's files:
+On Windows, a DLL swaps the mod's animations in and out while you play. Here, the installer builds a small **native plugin** (`ITPMac`) from your copy of the mod and puts it into the game (`red4ext/plugins/ITPMac`):
 
-- `itp_mac_tpp_animsets.archive` (about 80 MB): the mod's third-person versions of V's everyday animations (walking, idles, world actions). It leaves out the main movement sets, the gun/aim sets and the quest-scene sets on purpose, because those made first-person aiming shift or cutscenes look stiff.
-- `itp_mac_tpp_aim.archive` (about 90 MB): the mod's versions of the gun/aim movement sets. You will hardly see a difference.
-- `itp_mac_consumables.archive` (6 MB, female V only): the healing animation.
+- While third person is on, V uses the mod's third-person animations. In first person she uses the game's own animations, so first-person aiming is not changed.
+- It works on whatever animation sets the game has loaded, including the ones for cutscenes (sitting down, getting up, blinking).
+- It never writes into a set unless the mod's version has the same shape, and it puts the game's data back when third person ends.
+- No game file is edited. If anything looks wrong with V's animations, switch it off in **Mod Settings → Gameplay animations → Live animation swap**.
 
-No game file is edited. The swap also applies in first person (it cannot change while you play). In testing, first person looked normal, but if **anything looks wrong with V's animations, switch it off**:
+The installer also adds `itp_mac_consumables.archive` (6 MB): the healing animation.
+
+**Older way (optional).** `./scripts/install.sh <mod folder> --static-animations` builds three big files instead of the plugin (`itp_mac_tpp_animsets.archive`, `itp_mac_tpp_aim.archive`, `itp_mac_consumables.archive`). They replace V's animations in both views, with no plugin. Switch them off or on with:
 
 ```sh
 ./scripts/animations.sh off      # back to the game's own animations (files are only renamed)
 ./scripts/animations.sh on       # on again
 ```
 
-Quit the game first. You can also double-click **`scripts/Animations OFF.command`** or **`Animations ON.command`**.
-You can skip the swap at install time with `--no-animations`. The rest of the mod (camera, free look, settings) works with the swap on or off.
+Quit the game first. You can also double-click **`scripts/Animations OFF.command`** or **`Animations ON.command`**. Do not use both ways at once.
+The rest of the mod (camera, free look, settings) works with any of these options.
 
 ## How it works (short)
 
@@ -243,4 +247,4 @@ to clone this repo or run a script. Nothing is submitted yet, and it is up to Ni
 ## Notes
 
 - Do not mix this with other mods that replace the player's entity or animation graph.
-- If anyone knows how the original DLL swaps animations while playing, you are very welcome to get in touch.
+- If the plugin does not load, the game still starts: the installer only adds the plugin together with the script that uses it.
