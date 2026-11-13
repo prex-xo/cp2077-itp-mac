@@ -19,6 +19,22 @@ It is **not affiliated with or endorsed by CybrDrake**.
 
 Video link: https://youtu.be/131FJ6Wov84
 
+## Port status
+
+About **90% of the original mod's features** are ported, and about **95% of what you notice in normal play**.
+
+| Part | Status |
+|---|---|
+| Third-person camera, 5 profiles, free look, shoulder zoom, front view, quick first person, wall collision, camera motion | Done |
+| Automatic first person (weapons, vehicles, scanner, braindance) and third person in cutscenes and actions | Done |
+| Settings page and rebindable keys | Done |
+| Head follows camera | Done |
+| The mod's animations while third person is on (walking, idle, sitting and getting up in cutscenes, blinking), dash, healing, loot pickup, auto vault | Done (through a native Mac plugin) |
+| Head render guard | Not ported |
+| Sprint in every direction (and the GTA-style movement it belongs to) | Not ported |
+| Loot range extension | Not ported |
+| Weapon camera | Included, experimental |
+
 ## What you get
 
 Press **G** to switch between first and third person. Everything below works:
