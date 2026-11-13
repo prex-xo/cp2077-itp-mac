@@ -43,3 +43,9 @@ Findings from porting Immersive Third Person 2.0.1 to NightCity Console 1.9.0 / 
 
 ## Weapon camera (experimental, not being worked on)
 The option "Shoulder camera with a weapon" (Mod Settings, Weapon camera page) keeps third person with a close over-the-shoulder camera while aiming. It is kept in the mod but is not under development: the original mod has no third-person gun animations, so the arms stay stiff, and the aim alignment with bullets was never verified. It may be revisited later.
+
+## Future plan: a native Mac plugin for the DLL features (not started)
+The original mod's Windows DLL (`ImmersiveThirdPerson.dll`, 240 KB) does three jobs that are not ported: GTA-style movement relative to the camera (it hooks the input heading), the head render guard (turns off the game's near-camera head fade) and the scene redirect (swaps animation sets when a scene starts).
+Rough effort for a native plugin on NightCity Console's RED4ext: 3 to 10 million tokens in total, maybe a 40% chance of success. Setup and disassembly about 0.5 to 1.5 million, finding the matching functions in the Mac game binary 1 to 4 million (the biggest unknown), writing the plugin 0.5 to 1.5 million, in-game testing 1 to 3 million.
+By feature: movement relative to the camera 1 to 3 million, head guard 1 to 2 million (small gain), scene redirect 2 to 5 million (hardest, unclear what the DLL does exactly).
+Cheaper first steps: ask the original author how the DLL does these jobs, or try the movement feature in redscript only (the game's own camera-heading movement flag).
