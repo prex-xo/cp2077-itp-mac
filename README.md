@@ -35,7 +35,7 @@ Press **G** to switch between first and third person. Everything below works:
 
 ### Screenshot: third person in a cutscene
 
-During testing, third person also worked in several cutscenes. One example is the quiet scene with Judy at the window (Judy's arm around V's shoulders, the camera behind both of them, subtitle "But as of right now... I've still got a reason to stay."). V was in third person the whole time, with the dialogue choice shown as usual.
+During testing, third person also worked in several cutscenes. One example is the quiet scene with Judy at the window (V's arm around Judy's shoulders, the camera behind both of them, subtitle "But as of right now... I've still got a reason to stay."). V was in third person the whole time, with the dialogue choice shown as usual.
 Cutscenes are made for first person, so V can look a little stiff in some of them. That is why the cutscene options are off by default.
 
 ### Tip: remove the late head
