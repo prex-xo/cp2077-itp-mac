@@ -33,9 +33,18 @@ Press **G** to switch between first and third person. Everything below works:
 - **Head follows camera**: when V stands still, her head turns to where the camera looks.
 - A **settings page** in the game and **rebindable keys**.
 
-### Screenshot: third person in a cutscene
+### Screenshots: third person in cutscenes
 
-During testing, third person also worked in several cutscenes. One example is the quiet scene with Judy at the window (V's arm around Judy's shoulders, the camera behind both of them, subtitle "But as of right now... I've still got a reason to stay."). V was in third person the whole time, with the dialogue choice shown as usual.
+Third person also works in cutscenes, because the mod's animations are used there too (your choice in the settings, off by default).
+
+![Judy and V at the window: V's arm around Judy's shoulders, third person](images/judy-cutscene.jpg)
+
+*A quiet scene with Judy at the window, in third person.*
+
+![V talking to Rinder, who lies on a bed, seen from above, third person](images/rinder-cutscene.jpg)
+
+*A conversation with Rinder, in third person.*
+
 Cutscenes are made for first person, so V can look a little stiff in some of them. That is why the cutscene options are off by default.
 
 ### Tip: remove the late head
